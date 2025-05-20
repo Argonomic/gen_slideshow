@@ -1,10 +1,13 @@
-const { BrowserWindow } = require( 'electron' );
+const { BrowserWindow, Menu } = require( 'electron' );
 const fs = require( 'fs' );
 const path = require( 'path' );
+const windowWidth = 1920 * ( 2 / 3 ) + 4;
+const windowHeight = 1080 * ( 2 / 3 ) + 4;
+
 
 class Slideshow
 {
-	constructor( folderPath, audioFolderPath, windowWidth = 1600, windowHeight = 900 )
+	constructor( folderPath, audioFolderPath, windowWidth = windowWidth, windowHeight = windowHeight )
 	{
 		this.folderPath = folderPath;
 		this.audioFolderPath = audioFolderPath;
@@ -54,19 +57,24 @@ class Slideshow
 	{
 		const defaultFadeTime = 800;
 		const defaultImageDuration = 3800;
-		const finalFadeTime = 1200;
-		const finalImageDuration = 5000;
+		const finalFadeTime = 2000;
+		const finalImageDuration = 6000;
 		const finalPauseTime = 1000;
+		const secondToLastFadeTime = 200;
+		const secondToLastImageDuration = 200;
+		const secondToLastPauseTime = 200;
 		const scaleFactor = 1.05;
-		const PANSPEED_SCALE = 1.0;
+		let PANSPEED_SCALE = 0.5;
 
 		// Disable the menu bar
-		Menu.setApplicationMenu( null );
+		// Menu.setApplicationMenu( null );
 
 		this.window = new BrowserWindow( {
 			width: this.windowWidth,
 			height: this.windowHeight,
+			frame: false,
 			resizable: false,
+			transparent: false,
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,
@@ -97,8 +105,11 @@ class Slideshow
         const finalFadeTime = ${finalFadeTime};
         const finalImageDuration = ${finalImageDuration};
         const finalPauseTime = ${finalPauseTime};
+        const secondToLastFadeTime =  ${secondToLastFadeTime};
+        const secondToLastImageDuration =  ${secondToLastImageDuration};
+        const secondToLastPauseTime		   =  ${secondToLastPauseTime};
         const scaleFactor = ${scaleFactor};
-        const PANSPEED_SCALE = ${PANSPEED_SCALE};
+        let PANSPEED_SCALE = ${PANSPEED_SCALE};
         let currentImage;
         let nextImage;
         let currentAudio;
@@ -116,6 +127,8 @@ class Slideshow
         let pauseTime = 0;
         let alphaStep = 255 / (fadeTime * 60 / 1000);
         let isFinalImage = false;
+		  let isSecondToLastImage = false;
+
 		  let isFirstImage = true;
         let isSlideshowActive = true;
 
@@ -308,19 +321,39 @@ class Slideshow
 					console.log( "***4 imageDuration to " + imageDuration );
 				}
 
-            if (currentIndex === images.length - 1) {
+				if (currentIndex === images.length - 1) {
                 isFinalImage = true;
                 fadeTime = finalFadeTime;
                 imageDuration = finalImageDuration;
-					 console.log( "***5 imageDuration to " + imageDuration );
+                console.log( "***5 imageDuration to " + imageDuration );
                 pauseTime = finalPauseTime;
                 alphaStep = 255 / (fadeTime * 60 / 1000);
+                panSpeedX = 0;
+                panSpeedY = 0;
+					 console.log( "--8 panspeed to " + panSpeedX )
+					 
+					 console.log( "*********** FINAL IMAGE *********" )
+					 PANSPEED_SCALE = 0;
+					 currentPanSpeedX = 0;
+					 currentPanSpeedY = 0;
+					 nextPanSpeedX = 0;
+					 nextPanSpeedY = 0;
                 console.log('Switching to final image with custom timing:', 
                     'fadeTime:', fadeTime, 
                     'imageDuration:', imageDuration, 
                     'pauseTime:', pauseTime);
             }
-            if (currentIndex >= images.length) {
+
+				if ( currentIndex === images.length - 2 )
+				{
+				    isSecondToLastImage = true;
+                fadeTime = secondToLastFadeTime;
+                imageDuration = secondToLastImageDuration;
+                pauseTime = secondToLastPauseTime;
+                console.log( "***6 imageDuration to " + imageDuration );
+				}
+
+				if (currentIndex >= images.length) {
                 return;
             }
 
@@ -338,12 +371,14 @@ class Slideshow
                 panY = currentPanY;
                 panSpeedX = currentPanSpeedX;
                 panSpeedY = currentPanSpeedY;
+					 console.log( "--3 panspeed to " + panSpeedX )
             } else { // 'next'
                 panAngle = nextPanAngle;
                 panX = nextPanX;
                 panY = nextPanY;
                 panSpeedX = nextPanSpeedX;
                 panSpeedY = nextPanSpeedY;
+					 console.log( "--4 panspeed to " + panSpeedX )
             }
 
             panAngle = random(TWO_PI);
@@ -359,16 +394,28 @@ class Slideshow
             }
             let maxPanX = (imgW - width) / 4;
             let maxPanY = (imgH - height) / 4;
-            let totalDisplayTime = (type === 'current' && isFinalImage) ? finalImageDuration + finalFadeTime : defaultImageDuration + defaultFadeTime;
+				
+				let totalDisplayTime = defaultImageDuration + defaultFadeTime;
+				if ( type === 'current' )
+				{
+				   if ( isFinalImage )
+						totalDisplayTime = finalImageDuration + finalFadeTime;
+					else if ( isSecondToLastImage )
+						totalDisplayTime = secondToLastImageDuration + secondToLastFadeTime;
+			   }
+
+            // let totalDisplayTime = (type === 'current' && isFinalImage) ? finalImageDuration + finalFadeTime : defaultImageDuration + defaultFadeTime;
             let frames = (totalDisplayTime / 1000) * 60;
             panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
+				console.log( "--1 panspeed to " + panSpeedX )
             panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
             panSpeedX *= PANSPEED_SCALE;
             panSpeedY *= PANSPEED_SCALE;
-				if ( isFirstImage )
+				if ( isFirstImage || isFinalImage )
 				{
 					panSpeedX = 0;
 					panSpeedY = 0;
+					console.log( "--2 panspeed to 0" )
 				}
 				
             panX = -maxPanX * cos(panAngle);

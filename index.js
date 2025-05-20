@@ -3,8 +3,8 @@ const Slideshow = require( './slideshow.js' );
 
 const folderPath = 'd:/depots/gen_slideshow_download/images';
 const audioFolderPath = 'd:/depots/gen_slideshow_download/audio';
-const windowWidth = 1600;
-const windowHeight = 900;
+const windowWidth = 1920 * ( 2 / 3 ) + 4;
+const windowHeight = 1080 * ( 2 / 3 ) + 4;
 
 let mainWindow;
 
