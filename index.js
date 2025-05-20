@@ -1,9 +1,9 @@
 const { app } = require( 'electron' );
 const Slideshow = require( './slideshow.js' );
 
-const folderPath = 'C:/depots/gen_slideshow/images'; // Adjust to your images folder
-const windowWidth = 800; // Set your desired width
-const windowHeight = 600; // Set your desired height
+const folderPath = 'd:/depots/gen_slideshow_download/images'; // Adjust to your images folder
+const windowWidth = 1600; // Set your desired width
+const windowHeight = 900; // Set your desired height
 
 app.whenReady().then( async () =>
 {

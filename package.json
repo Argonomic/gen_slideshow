@@ -1,16 +1,17 @@
 {
-	"name": "slideshow-app",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"type": "commonjs",
-	"dependencies": {
-		"electron": "^33.0.2"
-	}
+  "name": "slideshow-app",
+  "version": "1.0.0",
+  "description": "This library is distributed under the terms of the zlib license:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "electron": "^33.4.11"
+  },
+  "devDependencies": {}
 }
