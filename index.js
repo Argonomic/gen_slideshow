@@ -1,13 +1,26 @@
-const { app } = require( 'electron' );
+const { app, BrowserWindow, contextBridge, ipcMain } = require( 'electron' );
 const Slideshow = require( './slideshow.js' );
 
-const folderPath = 'd:/depots/gen_slideshow_download/images'; // Adjust to your images folder
-const windowWidth = 1600; // Set your desired width
-const windowHeight = 900; // Set your desired height
+const folderPath = 'd:/depots/gen_slideshow_download/images';
+const audioFolderPath = 'd:/depots/gen_slideshow_download/audio';
+const windowWidth = 1600;
+const windowHeight = 900;
+
+let mainWindow;
 
 app.whenReady().then( async () =>
 {
-	const slideshow = new Slideshow( folderPath, windowWidth, windowHeight );
+	mainWindow = new BrowserWindow( {
+		width: windowWidth,
+		height: windowHeight,
+		webPreferences: {
+			nodeIntegration: false,
+			contextIsolation: true,
+			preload: `${__dirname}/preload.js`
+		}
+	} );
+
+	const slideshow = new Slideshow( folderPath, audioFolderPath, windowWidth, windowHeight );
 	try
 	{
 		const success = await slideshow.init();
@@ -16,13 +29,21 @@ app.whenReady().then( async () =>
 			slideshow.start();
 		} else
 		{
-			console.error( 'Slideshow initialization failed. Check if the folder exists and contains JPG files.' );
+			console.error( 'Slideshow initialization failed. Check if the folders exist and contain JPG and MP3 files.' );
 			app.quit();
 		}
 	} catch ( err )
 	{
-		console.error( 'Error reading folder or starting slideshow:', err );
+		console.error( 'Error reading folders or starting slideshow:', err );
 		app.quit();
+	}
+} );
+
+ipcMain.on( 'close-window', () =>
+{
+	if ( mainWindow && !mainWindow.isDestroyed() )
+	{
+		mainWindow.close();
 	}
 } );
 

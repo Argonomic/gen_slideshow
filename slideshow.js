@@ -4,12 +4,14 @@ const path = require( 'path' );
 
 class Slideshow
 {
-	constructor( folderPath, windowWidth = 1600, windowHeight = 900 )
+	constructor( folderPath, audioFolderPath, windowWidth = 1600, windowHeight = 900 )
 	{
 		this.folderPath = folderPath;
+		this.audioFolderPath = audioFolderPath;
 		this.windowWidth = windowWidth;
 		this.windowHeight = windowHeight;
 		this.images = [];
+		this.audioFiles = [];
 		this.window = null;
 	}
 
@@ -17,9 +19,10 @@ class Slideshow
 	{
 		try
 		{
-			let files = await fs.promises.readdir( this.folderPath );
-			files.sort( ( a, b ) => a.localeCompare( b, undefined, { sensitivity: 'base' } ) );
-			this.images = files
+			// Load images
+			let imageFiles = await fs.promises.readdir( this.folderPath );
+			imageFiles.sort( ( a, b ) => a.localeCompare( b, undefined, { sensitivity: 'base' } ) );
+			this.images = imageFiles
 				.filter( file => file.toLowerCase().endsWith( '.jpg' ) || file.toLowerCase().endsWith( '.jpeg' ) )
 				.map( file => `file://${path.join( this.folderPath, file ).replace( /\\/g, '/' )}` );
 			if ( this.images.length === 0 )
@@ -27,10 +30,22 @@ class Slideshow
 				console.error( 'No JPG files found in the specified folder.' );
 				return false;
 			}
+
+			// Load audio files
+			let audioFiles = await fs.promises.readdir( this.audioFolderPath );
+			audioFiles.sort( ( a, b ) => a.localeCompare( b, undefined, { sensitivity: 'base' } ) );
+			this.audioFiles = audioFiles
+				.filter( file => file.toLowerCase().endsWith( '.mp3' ) )
+				.map( file => `file://${path.join( this.audioFolderPath, file ).replace( /\\/g, '/' )}` );
+			if ( this.audioFiles.length === 0 )
+			{
+				console.warn( 'No MP3 files found in the specified audio folder. Proceeding without audio.' );
+			}
+
 			return true;
 		} catch ( err )
 		{
-			console.error( 'Error reading folder:', err );
+			console.error( 'Error reading folders:', err );
 			return false;
 		}
 	}
@@ -38,12 +53,12 @@ class Slideshow
 	start()
 	{
 		const defaultFadeTime = 800;
-		const defaultImageDuration = 2400;
+		const defaultImageDuration = 3800;
 		const finalFadeTime = 1200;
 		const finalImageDuration = 5000;
 		const finalPauseTime = 1000;
 		const scaleFactor = 1.05;
-		const PANSPEED_SCALE = 0.5; // Default value; adjust as needed
+		const PANSPEED_SCALE = 1.0;
 
 		this.window = new BrowserWindow( {
 			width: this.windowWidth,
@@ -62,8 +77,9 @@ class Slideshow
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JPG Slideshow</title>
+    <title>JPG Slideshow with Audio</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/addons/p5.sound.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; overflow: hidden; }
         canvas { display: block; }
@@ -72,16 +88,19 @@ class Slideshow
 <body>
     <script>
         const images = ${JSON.stringify( this.images )};
+        const audioFiles = ${JSON.stringify( this.audioFiles )};
         const defaultFadeTime = ${defaultFadeTime};
         const defaultImageDuration = ${defaultImageDuration};
         const finalFadeTime = ${finalFadeTime};
         const finalImageDuration = ${finalImageDuration};
         const finalPauseTime = ${finalPauseTime};
         const scaleFactor = ${scaleFactor};
-        const PANSPEED_SCALE = ${PANSPEED_SCALE}; // Adjustable panning speed scale
+        const PANSPEED_SCALE = ${PANSPEED_SCALE};
         let currentImage;
         let nextImage;
+        let currentAudio;
         let currentIndex = 0;
+        let audioIndex = 0;
         let currentAlpha = 0;
         let nextAlpha = 0;
         let phase = 'fadeIn';
@@ -93,6 +112,7 @@ class Slideshow
         let pauseTime = 0;
         let alphaStep = 255 / (fadeTime * 60 / 1000);
         let isFinalImage = false;
+        let isSlideshowActive = true;
 
         function preload() {
             if (images.length > 0) {
@@ -104,6 +124,12 @@ class Slideshow
                     nextImage = loadImage(images[1]);
                 }
             }
+            if (audioFiles.length > 0) {
+                currentAudio = loadSound(audioFiles[0], 
+                    () => console.log('Preload: Loaded audio:', audioFiles[0]),
+                    err => console.error('Preload: Error loading audio:', audioFiles[0], err)
+                );
+            }
         }
 
         function setup() {
@@ -112,6 +138,31 @@ class Slideshow
             background(0);
             setNewPanDirection('current');
             lastSwitchTime = millis();
+
+            // Start audio playback
+            if (audioFiles.length > 0) {
+                playNextAudio();
+            }
+        }
+
+        function playNextAudio() {
+            if (!isSlideshowActive) return; // Stop audio playback if slideshow is done
+            if (currentAudio) {
+                currentAudio.stop(); // Stop any currently playing audio
+            }
+            currentAudio = loadSound(audioFiles[audioIndex], 
+                () => {
+                    if (isSlideshowActive) {
+                        console.log('Playing audio:', audioFiles[audioIndex]);
+                        currentAudio.play();
+                        currentAudio.onended(() => {
+                            audioIndex = (audioIndex + 1) % audioFiles.length;
+                            playNextAudio(); // Play the next audio when this one ends
+                        });
+                    }
+                },
+                err => console.error('Error loading audio:', audioFiles[audioIndex], err)
+            );
         }
 
         function draw() {
@@ -129,9 +180,9 @@ class Slideshow
                 if (elapsed >= imageDuration) {
                     phase = 'crossfade';
                     if (isFinalImage) {
-                        nextImage = null; // Fade to black for final image
+                        nextImage = null;
                     } else {
-                        setNewPanDirection('next'); // Set new panning for next image
+                        setNewPanDirection('next');
                     }
                 }
             } else if (phase === 'crossfade') {
@@ -158,6 +209,11 @@ class Slideshow
             } else if (phase === 'pause') {
                 if (elapsed >= imageDuration + fadeTime + pauseTime) {
                     console.log('Final image display complete. Stopping slideshow.');
+                    isSlideshowActive = false;
+                    if (currentAudio) {
+                        currentAudio.stop();
+                        console.log('Stopped audio at slideshow end');
+                    }
                     window.electronAPI.closeWindow();
                     return;
                 }
@@ -280,13 +336,12 @@ class Slideshow
             }
             let maxPanX = (imgW - width) / 4;
             let maxPanY = (imgH - height) / 4;
-            // Adjust frames to include fadeTime since the image is visible during crossfade
             let totalDisplayTime = (type === 'current' && isFinalImage) ? finalImageDuration + finalFadeTime : defaultImageDuration + defaultFadeTime;
             let frames = (totalDisplayTime / 1000) * 60;
             panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
             panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
-            panSpeedX *= PANSPEED_SCALE; // Apply panning speed scale
-            panSpeedY *= PANSPEED_SCALE; // Apply panning speed scale
+            panSpeedX *= PANSPEED_SCALE;
+            panSpeedY *= PANSPEED_SCALE;
             panX = -maxPanX * cos(panAngle);
             panY = -maxPanY * sin(panAngle);
 
