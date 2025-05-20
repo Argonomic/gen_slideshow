@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG Slideshow</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script>
+        const images = ["file://C:/depots/gen_slideshow/images/005.jpg","file://C:/depots/gen_slideshow/images/008_william.jpg","file://C:/depots/gen_slideshow/images/008.jpg","file://C:/depots/gen_slideshow/images/030_jack.jpg","file://C:/depots/gen_slideshow/images/033.jpg","file://C:/depots/gen_slideshow/images/080_ella.jpg","file://C:/depots/gen_slideshow/images/080_lainey.jpg","file://C:/depots/gen_slideshow/images/120_leo.jpg","file://C:/depots/gen_slideshow/images/120_naomi.jpg","file://C:/depots/gen_slideshow/images/1200_140_IMG_0625.jpg","file://C:/depots/gen_slideshow/images/125.jpg","file://C:/depots/gen_slideshow/images/135.jpg","file://C:/depots/gen_slideshow/images/150_matilda.jpg","file://C:/depots/gen_slideshow/images/162_olu.jpg","file://C:/depots/gen_slideshow/images/200_ryland.jpg","file://C:/depots/gen_slideshow/images/230_dawson.jpg","file://C:/depots/gen_slideshow/images/255.jpg","file://C:/depots/gen_slideshow/images/270.jpg","file://C:/depots/gen_slideshow/images/300_august.jpg","file://C:/depots/gen_slideshow/images/300_linly.jpg","file://C:/depots/gen_slideshow/images/310_IMG_1055.jpg","file://C:/depots/gen_slideshow/images/320_IMG_1639.jpg","file://C:/depots/gen_slideshow/images/330_IMG_7575.jpg","file://C:/depots/gen_slideshow/images/350_florence.jpg","file://C:/depots/gen_slideshow/images/380_IMG_8710.jpg","file://C:/depots/gen_slideshow/images/400_jaimin.jpg","file://C:/depots/gen_slideshow/images/450_charlie.jpg","file://C:/depots/gen_slideshow/images/470_george.jpg","file://C:/depots/gen_slideshow/images/500_IMG_8080.jpg","file://C:/depots/gen_slideshow/images/5000.jpg","file://C:/depots/gen_slideshow/images/520_khushi.jpg","file://C:/depots/gen_slideshow/images/525.jpg","file://C:/depots/gen_slideshow/images/530_IMG_7490.jpg","file://C:/depots/gen_slideshow/images/633.jpg","file://C:/depots/gen_slideshow/images/638_spencer.jpg","file://C:/depots/gen_slideshow/images/700_IMG_1640.jpg","file://C:/depots/gen_slideshow/images/710_kinsey.jpg","file://C:/depots/gen_slideshow/images/720_IMG_1658.jpg","file://C:/depots/gen_slideshow/images/720.jpg","file://C:/depots/gen_slideshow/images/800_elise.jpg","file://C:/depots/gen_slideshow/images/870_IMG_3922.jpg","file://C:/depots/gen_slideshow/images/920_nicholas.jpg"];
+        const fadeTime = 800;
+        const imageDuration = 2400;
+        const pauseTime = 250;
+        const alphaStep = 10.625;
+        let currentImage;
+        let nextImage;
+        let currentIndex = 0;
+        let alpha = 0;
+        let phase = 'fadeIn';
+        let lastSwitchTime = 0;
+        let panX = 0;
+        let panY = 0;
+        let panSpeedX = 0;
+        let panSpeedY = 0;
+        let scaleFactor = 1.2;
+
+        function preload() {
+            if (images.length > 0) {
+                currentImage = loadImage(images[0]);
+                if (images.length > 1) {
+                    nextImage = loadImage(images[1]);
+                }
+            }
+        }
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            setNewPanDirection();
+            lastSwitchTime = millis();
+        }
+
+        function draw() {
+            background(0);
+            let elapsed = millis() - lastSwitchTime;
+            if (phase === 'fadeIn') {
+                alpha = min(alpha + alphaStep, 255);
+                if (elapsed >= fadeTime / 2) {
+                    alpha = 255;
+                    phase = 'display';
+                }
+            } else if (phase === 'display') {
+                alpha = 255;
+                if (elapsed >= imageDuration - (fadeTime / 2)) {
+                    phase = 'fadeOut';
+                }
+            } else if (phase === 'fadeOut') {
+                alpha = max(alpha - alphaStep, 0);
+                if (alpha <= 0) {
+                    phase = 'pause';
+                }
+            } else if (phase === 'pause') {
+                alpha = 0;
+                if (elapsed >= imageDuration + pauseTime) {
+                    switchImage();
+                    lastSwitchTime = millis();
+                    phase = 'fadeIn';
+                    alpha = 0;
+                }
+            }
+            if (currentImage && phase !== 'pause') {
+                let imgRatio = currentImage.width / currentImage.height;
+                let canvasRatio = width / height;
+                let imgW, imgH;
+                if (imgRatio > canvasRatio) {
+                    imgH = height * scaleFactor;
+                    imgW = imgH * imgRatio;
+                } else {
+                    imgW = width * scaleFactor;
+                    imgH = imgW / imgRatio;
+                }
+                panX += panSpeedX;
+                panY += panSpeedY;
+                let maxPanX = (imgW - width) / 2;
+                let maxPanY = (imgH - height) / 2;
+                panX = constrain(panX, -maxPanX, maxPanX);
+                panY = constrain(panY, -maxPanY, maxPanY);
+                let x = width / 2 + panX;
+                let y = height / 2 + panY;
+                push();
+                translate(x, y);
+                imageMode(CENTER);
+                tint(255, alpha);
+                image(currentImage, 0, 0, imgW, imgH);
+                pop();
+            }
+        }
+
+        function switchImage() {
+            currentIndex = (currentIndex + 1) % images.length;
+            currentImage = nextImage || currentImage;
+            nextImage = images[currentIndex + 1] ? loadImage(images[currentIndex + 1]) : null;
+            setNewPanDirection();
+        }
+
+        function setNewPanDirection() {
+            let angle = random(TWO_PI);
+            let speed = 0.5;
+            panSpeedX = cos(angle) * speed;
+            panSpeedY = sin(angle) * speed;
+            panX = 0;
+            panY = 0;
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>
+        
