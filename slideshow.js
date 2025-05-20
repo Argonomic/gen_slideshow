@@ -4,7 +4,7 @@ const path = require( 'path' );
 
 class Slideshow
 {
-	constructor( folderPath, windowWidth = 800, windowHeight = 600 )
+	constructor( folderPath, windowWidth = 1600, windowHeight = 900 )
 	{
 		this.folderPath = folderPath;
 		this.windowWidth = windowWidth;
@@ -41,10 +41,12 @@ class Slideshow
 		const imageDuration = 2400;
 		const pauseTime = 250;
 		const alphaStep = 255 / ( ( fadeTime / 2 ) * 60 / 1000 );
+		const scaleFactor = 1.05; // Keep a slight zoom, but minimal
 
 		this.window = new BrowserWindow( {
 			width: this.windowWidth,
 			height: this.windowHeight,
+			resizable: false,
 			webPreferences: {
 				nodeIntegration: true,
 				contextIsolation: false
@@ -71,6 +73,7 @@ class Slideshow
         const imageDuration = ${imageDuration};
         const pauseTime = ${pauseTime};
         const alphaStep = ${alphaStep};
+        const scaleFactor = ${scaleFactor};
         let currentImage;
         let nextImage;
         let currentIndex = 0;
@@ -81,11 +84,14 @@ class Slideshow
         let panY = 0;
         let panSpeedX = 0;
         let panSpeedY = 0;
-        let scaleFactor = 1.2;
+        let panAngle = 0;
 
         function preload() {
             if (images.length > 0) {
-                currentImage = loadImage(images[0]);
+                currentImage = loadImage(images[0], 
+                    () => console.log('Preload: Loaded image:', images[0]),
+                    err => console.error('Preload: Error loading image:', images[0], err)
+                );
                 if (images.length > 1) {
                     nextImage = loadImage(images[1]);
                 }
@@ -94,6 +100,8 @@ class Slideshow
 
         function setup() {
             createCanvas(windowWidth, windowHeight);
+            console.log('Setup: Canvas created with dimensions:', windowWidth, 'x', windowHeight);
+            background(0);
             setNewPanDirection();
             lastSwitchTime = millis();
         }
@@ -101,6 +109,7 @@ class Slideshow
         function draw() {
             background(0);
             let elapsed = millis() - lastSwitchTime;
+
             if (phase === 'fadeIn') {
                 alpha = min(alpha + alphaStep, 255);
                 if (elapsed >= fadeTime / 2) {
@@ -126,6 +135,7 @@ class Slideshow
                     alpha = 0;
                 }
             }
+
             if (currentImage && phase !== 'pause') {
                 let imgRatio = currentImage.width / currentImage.height;
                 let canvasRatio = width / height;
@@ -137,14 +147,20 @@ class Slideshow
                     imgW = width * scaleFactor;
                     imgH = imgW / imgRatio;
                 }
+
+                // Limit panning to keep more of the image on-screen
+                let maxPanX = (imgW - width) / 4; // Reduced to 25% of the excess
+                let maxPanY = (imgH - height) / 4; // Reduced to 25% of the excess
                 panX += panSpeedX;
                 panY += panSpeedY;
-                let maxPanX = (imgW - width) / 2;
-                let maxPanY = (imgH - height) / 2;
                 panX = constrain(panX, -maxPanX, maxPanX);
                 panY = constrain(panY, -maxPanY, maxPanY);
+
                 let x = width / 2 + panX;
                 let y = height / 2 + panY;
+
+                console.log('Draw: panX:', panX, 'panY:', panY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
+
                 push();
                 translate(x, y);
                 imageMode(CENTER);
@@ -162,12 +178,27 @@ class Slideshow
         }
 
         function setNewPanDirection() {
-            let angle = random(TWO_PI);
-            let speed = 0.5;
-            panSpeedX = cos(angle) * speed;
-            panSpeedY = sin(angle) * speed;
-            panX = 0;
-            panY = 0;
+            panAngle = random(TWO_PI);
+            // Calculate speeds to traverse maxPanX/maxPanY over imageDuration
+            let imgRatio = currentImage ? (currentImage.width / currentImage.height) : (windowWidth / windowHeight);
+            let canvasRatio = windowWidth / windowHeight;
+            let imgW, imgH;
+            if (imgRatio > canvasRatio) {
+                imgH = windowHeight * scaleFactor;
+                imgW = imgH * imgRatio;
+            } else {
+                imgW = windowWidth * scaleFactor;
+                imgH = imgW / imgRatio;
+            }
+            let maxPanX = (imgW - windowWidth) / 4;
+            let maxPanY = (imgH - windowHeight) / 4;
+            // Speed to traverse from -max to +max over imageDuration
+            let frames = (imageDuration / 1000) * 60; // Assuming 60 FPS
+            panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
+            panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
+            panX = -maxPanX * cos(panAngle);
+            panY = -maxPanY * sin(panAngle);
+            console.log('SetNewPanDirection: angle:', panAngle, 'speedX:', panSpeedX, 'speedY:', panSpeedY);
         }
 
         function windowResized() {
