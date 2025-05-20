@@ -20,6 +20,7 @@
         const finalImageDuration = 5000;
         const finalPauseTime = 1000;
         const scaleFactor = 1.05;
+		  const PAN_MOD = 0.5;
         let currentImage;
         let nextImage;
         let currentIndex = 0;
@@ -226,6 +227,8 @@
             let frames = (totalDisplayTime / 1000) * 60;
             panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
             panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
+				panSpeedX *= PAN_MOD;
+				panSpeedY *= PAN_MOD;
             panX = -maxPanX * cos(panAngle);
             panY = -maxPanY * sin(panAngle);
 

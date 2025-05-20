@@ -43,6 +43,7 @@ class Slideshow
 		const finalImageDuration = 5000;
 		const finalPauseTime = 1000;
 		const scaleFactor = 1.05;
+		const PANSPEED_SCALE = 0.5; // Default value; adjust as needed
 
 		this.window = new BrowserWindow( {
 			width: this.windowWidth,
@@ -77,6 +78,7 @@ class Slideshow
         const finalImageDuration = ${finalImageDuration};
         const finalPauseTime = ${finalPauseTime};
         const scaleFactor = ${scaleFactor};
+        const PANSPEED_SCALE = ${PANSPEED_SCALE}; // Adjustable panning speed scale
         let currentImage;
         let nextImage;
         let currentIndex = 0;
@@ -276,13 +278,15 @@ class Slideshow
                 imgW = windowWidth * scaleFactor;
                 imgH = imgW / imgRatio;
             }
-            let maxPanX = (imgW - windowWidth) / 4;
-            let maxPanY = (imgH - windowHeight) / 4;
+            let maxPanX = (imgW - width) / 4;
+            let maxPanY = (imgH - height) / 4;
             // Adjust frames to include fadeTime since the image is visible during crossfade
             let totalDisplayTime = (type === 'current' && isFinalImage) ? finalImageDuration + finalFadeTime : defaultImageDuration + defaultFadeTime;
             let frames = (totalDisplayTime / 1000) * 60;
             panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
             panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
+            panSpeedX *= PANSPEED_SCALE; // Apply panning speed scale
+            panSpeedY *= PANSPEED_SCALE; // Apply panning speed scale
             panX = -maxPanX * cos(panAngle);
             panY = -maxPanY * sin(panAngle);
 
