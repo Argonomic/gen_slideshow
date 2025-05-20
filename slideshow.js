@@ -60,6 +60,9 @@ class Slideshow
 		const scaleFactor = 1.05;
 		const PANSPEED_SCALE = 1.0;
 
+		// Disable the menu bar
+		Menu.setApplicationMenu( null );
+
 		this.window = new BrowserWindow( {
 			width: this.windowWidth,
 			height: this.windowHeight,
