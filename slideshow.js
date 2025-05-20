@@ -37,19 +37,21 @@ class Slideshow
 
 	start()
 	{
-		const fadeTime = 800;
-		const imageDuration = 2400;
-		const pauseTime = 250;
-		const alphaStep = 255 / ( ( fadeTime / 2 ) * 60 / 1000 );
-		const scaleFactor = 1.05; // Keep a slight zoom, but minimal
+		const defaultFadeTime = 800;
+		const defaultImageDuration = 2400;
+		const finalFadeTime = 1200;
+		const finalImageDuration = 5000;
+		const finalPauseTime = 1000;
+		const scaleFactor = 1.05;
 
 		this.window = new BrowserWindow( {
 			width: this.windowWidth,
 			height: this.windowHeight,
 			resizable: false,
 			webPreferences: {
-				nodeIntegration: true,
-				contextIsolation: false
+				nodeIntegration: false,
+				contextIsolation: true,
+				preload: `${__dirname}/preload.js`
 			}
 		} );
 
@@ -69,22 +71,26 @@ class Slideshow
 <body>
     <script>
         const images = ${JSON.stringify( this.images )};
-        const fadeTime = ${fadeTime};
-        const imageDuration = ${imageDuration};
-        const pauseTime = ${pauseTime};
-        const alphaStep = ${alphaStep};
+        const defaultFadeTime = ${defaultFadeTime};
+        const defaultImageDuration = ${defaultImageDuration};
+        const finalFadeTime = ${finalFadeTime};
+        const finalImageDuration = ${finalImageDuration};
+        const finalPauseTime = ${finalPauseTime};
         const scaleFactor = ${scaleFactor};
         let currentImage;
         let nextImage;
         let currentIndex = 0;
-        let alpha = 0;
+        let currentAlpha = 0;
+        let nextAlpha = 0;
         let phase = 'fadeIn';
         let lastSwitchTime = 0;
-        let panX = 0;
-        let panY = 0;
-        let panSpeedX = 0;
-        let panSpeedY = 0;
-        let panAngle = 0;
+        let currentPanX = 0, currentPanY = 0, currentPanSpeedX = 0, currentPanSpeedY = 0, currentPanAngle = 0;
+        let nextPanX = 0, nextPanY = 0, nextPanSpeedX = 0, nextPanSpeedY = 0, nextPanAngle = 0;
+        let fadeTime = defaultFadeTime;
+        let imageDuration = defaultImageDuration;
+        let pauseTime = 0;
+        let alphaStep = 255 / (fadeTime * 60 / 1000);
+        let isFinalImage = false;
 
         function preload() {
             if (images.length > 0) {
@@ -102,7 +108,7 @@ class Slideshow
             createCanvas(windowWidth, windowHeight);
             console.log('Setup: Canvas created with dimensions:', windowWidth, 'x', windowHeight);
             background(0);
-            setNewPanDirection();
+            setNewPanDirection('current');
             lastSwitchTime = millis();
         }
 
@@ -111,32 +117,52 @@ class Slideshow
             let elapsed = millis() - lastSwitchTime;
 
             if (phase === 'fadeIn') {
-                alpha = min(alpha + alphaStep, 255);
-                if (elapsed >= fadeTime / 2) {
-                    alpha = 255;
+                currentAlpha = min(currentAlpha + alphaStep, 255);
+                if (elapsed >= fadeTime) {
+                    currentAlpha = 255;
                     phase = 'display';
                 }
             } else if (phase === 'display') {
-                alpha = 255;
-                if (elapsed >= imageDuration - (fadeTime / 2)) {
-                    phase = 'fadeOut';
+                currentAlpha = 255;
+                if (elapsed >= imageDuration) {
+                    phase = 'crossfade';
+                    if (isFinalImage) {
+                        nextImage = null; // Fade to black for final image
+                    } else {
+                        setNewPanDirection('next'); // Set new panning for next image
+                    }
                 }
-            } else if (phase === 'fadeOut') {
-                alpha = max(alpha - alphaStep, 0);
-                if (alpha <= 0) {
-                    phase = 'pause';
+            } else if (phase === 'crossfade') {
+                currentAlpha = max(currentAlpha - alphaStep, 0);
+                if (nextImage) {
+                    nextAlpha = min(nextAlpha + alphaStep, 255 - currentAlpha);
+                }
+                if (currentAlpha <= 0) {
+                    if (isFinalImage) {
+                        phase = 'pause';
+                    } else {
+                        switchImage();
+                        lastSwitchTime = millis();
+                        phase = 'fadeIn';
+                        currentAlpha = nextAlpha;
+                        nextAlpha = 0;
+                        currentPanX = nextPanX;
+                        currentPanY = nextPanY;
+                        currentPanSpeedX = nextPanSpeedX;
+                        currentPanSpeedY = nextPanSpeedY;
+                        currentPanAngle = nextPanAngle;
+                    }
                 }
             } else if (phase === 'pause') {
-                alpha = 0;
-                if (elapsed >= imageDuration + pauseTime) {
-                    switchImage();
-                    lastSwitchTime = millis();
-                    phase = 'fadeIn';
-                    alpha = 0;
+                if (elapsed >= imageDuration + fadeTime + pauseTime) {
+                    console.log('Final image display complete. Stopping slideshow.');
+                    window.electronAPI.closeWindow();
+                    return;
                 }
             }
 
-            if (currentImage && phase !== 'pause') {
+            // Draw current image
+            if (currentImage) {
                 let imgRatio = currentImage.width / currentImage.height;
                 let canvasRatio = width / height;
                 let imgW, imgH;
@@ -148,39 +174,99 @@ class Slideshow
                     imgH = imgW / imgRatio;
                 }
 
-                // Limit panning to keep more of the image on-screen
-                let maxPanX = (imgW - width) / 4; // Reduced to 25% of the excess
-                let maxPanY = (imgH - height) / 4; // Reduced to 25% of the excess
-                panX += panSpeedX;
-                panY += panSpeedY;
-                panX = constrain(panX, -maxPanX, maxPanX);
-                panY = constrain(panY, -maxPanY, maxPanY);
+                let maxPanX = (imgW - width) / 4;
+                let maxPanY = (imgH - height) / 4;
+                currentPanX += currentPanSpeedX;
+                currentPanY += currentPanSpeedY;
+                currentPanX = constrain(currentPanX, -maxPanX, maxPanX);
+                currentPanY = constrain(currentPanY, -maxPanY, maxPanY);
 
-                let x = width / 2 + panX;
-                let y = height / 2 + panY;
+                let x = width / 2 + currentPanX;
+                let y = height / 2 + currentPanY;
 
-                console.log('Draw: panX:', panX, 'panY:', panY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
+                console.log('Draw: currentPanX:', currentPanX, 'currentPanY:', currentPanY, 'currentPanSpeedX:', currentPanSpeedX, 'currentPanSpeedY:', currentPanSpeedY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
 
                 push();
                 translate(x, y);
                 imageMode(CENTER);
-                tint(255, alpha);
+                tint(255, currentAlpha);
                 image(currentImage, 0, 0, imgW, imgH);
+                pop();
+            }
+
+            // Draw next image during crossfade
+            if (nextImage && phase === 'crossfade') {
+                let imgRatio = nextImage.width / nextImage.height;
+                let canvasRatio = width / height;
+                let imgW, imgH;
+                if (imgRatio > canvasRatio) {
+                    imgH = height * scaleFactor;
+                    imgW = imgH * imgRatio;
+                } else {
+                    imgW = width * scaleFactor;
+                    imgH = imgW / imgRatio;
+                }
+
+                let maxPanX = (imgW - width) / 4;
+                let maxPanY = (imgH - height) / 4;
+                nextPanX += nextPanSpeedX;
+                nextPanY += nextPanSpeedY;
+                nextPanX = constrain(nextPanX, -maxPanX, maxPanX);
+                nextPanY = constrain(nextPanY, -maxPanY, maxPanY);
+
+                let x = width / 2 + nextPanX;
+                let y = height / 2 + nextPanY;
+
+                console.log('Draw (next): nextPanX:', nextPanX, 'nextPanY:', nextPanY, 'nextPanSpeedX:', nextPanSpeedX, 'nextPanSpeedY:', nextPanSpeedY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
+
+                push();
+                translate(x, y);
+                imageMode(CENTER);
+                tint(255, nextAlpha);
+                image(nextImage, 0, 0, imgW, imgH);
                 pop();
             }
         }
 
         function switchImage() {
-            currentIndex = (currentIndex + 1) % images.length;
+            currentIndex = (currentIndex + 1);
+            if (currentIndex === images.length - 1) {
+                isFinalImage = true;
+                fadeTime = finalFadeTime;
+                imageDuration = finalImageDuration;
+                pauseTime = finalPauseTime;
+                alphaStep = 255 / (fadeTime * 60 / 1000);
+                console.log('Switching to final image with custom timing:', 
+                    'fadeTime:', fadeTime, 
+                    'imageDuration:', imageDuration, 
+                    'pauseTime:', pauseTime);
+            }
+            if (currentIndex >= images.length) {
+                return;
+            }
             currentImage = nextImage || currentImage;
-            nextImage = images[currentIndex + 1] ? loadImage(images[currentIndex + 1]) : null;
-            setNewPanDirection();
+            nextImage = currentIndex + 1 < images.length ? loadImage(images[currentIndex + 1]) : null;
+            setNewPanDirection('current');
         }
 
-        function setNewPanDirection() {
+        function setNewPanDirection(type) {
+            let panAngle, panX, panY, panSpeedX, panSpeedY;
+            if (type === 'current') {
+                panAngle = currentPanAngle;
+                panX = currentPanX;
+                panY = currentPanY;
+                panSpeedX = currentPanSpeedX;
+                panSpeedY = currentPanSpeedY;
+            } else { // 'next'
+                panAngle = nextPanAngle;
+                panX = nextPanX;
+                panY = nextPanY;
+                panSpeedX = nextPanSpeedX;
+                panSpeedY = nextPanSpeedY;
+            }
+
             panAngle = random(TWO_PI);
-            // Calculate speeds to traverse maxPanX/maxPanY over imageDuration
-            let imgRatio = currentImage ? (currentImage.width / currentImage.height) : (windowWidth / windowHeight);
+            let imgRatio = (type === 'current' ? currentImage : nextImage).width / (type === 'current' ? currentImage : nextImage).height;
             let canvasRatio = windowWidth / windowHeight;
             let imgW, imgH;
             if (imgRatio > canvasRatio) {
@@ -192,13 +278,29 @@ class Slideshow
             }
             let maxPanX = (imgW - windowWidth) / 4;
             let maxPanY = (imgH - windowHeight) / 4;
-            // Speed to traverse from -max to +max over imageDuration
-            let frames = (imageDuration / 1000) * 60; // Assuming 60 FPS
+            // Adjust frames to include fadeTime since the image is visible during crossfade
+            let totalDisplayTime = (type === 'current' && isFinalImage) ? finalImageDuration + finalFadeTime : defaultImageDuration + defaultFadeTime;
+            let frames = (totalDisplayTime / 1000) * 60;
             panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
             panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
             panX = -maxPanX * cos(panAngle);
             panY = -maxPanY * sin(panAngle);
-            console.log('SetNewPanDirection: angle:', panAngle, 'speedX:', panSpeedX, 'speedY:', panSpeedY);
+
+            if (type === 'current') {
+                currentPanAngle = panAngle;
+                currentPanX = panX;
+                currentPanY = panY;
+                currentPanSpeedX = panSpeedX;
+                currentPanSpeedY = panSpeedY;
+                console.log('SetNewPanDirection (current): angle:', currentPanAngle, 'speedX:', currentPanSpeedX, 'speedY:', currentPanSpeedY);
+            } else { // 'next'
+                nextPanAngle = panAngle;
+                nextPanX = panX;
+                nextPanY = panY;
+                nextPanSpeedX = panSpeedX;
+                nextPanSpeedY = panSpeedY;
+                console.log('SetNewPanDirection (next): angle:', nextPanAngle, 'speedX:', nextPanSpeedX, 'speedY:', nextPanSpeedY);
+            }
         }
 
         function windowResized() {
