@@ -108,10 +108,12 @@ class Slideshow
         let currentPanX = 0, currentPanY = 0, currentPanSpeedX = 0, currentPanSpeedY = 0, currentPanAngle = 0;
         let nextPanX = 0, nextPanY = 0, nextPanSpeedX = 0, nextPanSpeedY = 0, nextPanAngle = 0;
         let fadeTime = defaultFadeTime;
-        let imageDuration = defaultImageDuration;
+        let imageDuration = 2500; // initial image
+		  console.log( "***1 imageDuration to " + imageDuration )
         let pauseTime = 0;
         let alphaStep = 255 / (fadeTime * 60 / 1000);
         let isFinalImage = false;
+		  let isFirstImage = true;
         let isSlideshowActive = true;
 
         function preload() {
@@ -242,7 +244,7 @@ class Slideshow
                 let x = width / 2 + currentPanX;
                 let y = height / 2 + currentPanY;
 
-                console.log('Draw: currentPanX:', currentPanX, 'currentPanY:', currentPanY, 'currentPanSpeedX:', currentPanSpeedX, 'currentPanSpeedY:', currentPanSpeedY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
+               //  console.log('Draw: currentPanX:', currentPanX, 'currentPanY:', currentPanY, 'currentPanSpeedX:', currentPanSpeedX, 'currentPanSpeedY:', currentPanSpeedY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
 
                 push();
                 translate(x, y);
@@ -275,7 +277,7 @@ class Slideshow
                 let x = width / 2 + nextPanX;
                 let y = height / 2 + nextPanY;
 
-                console.log('Draw (next): nextPanX:', nextPanX, 'nextPanY:', nextPanY, 'nextPanSpeedX:', nextPanSpeedX, 'nextPanSpeedY:', nextPanSpeedY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
+               //  console.log('Draw (next): nextPanX:', nextPanX, 'nextPanY:', nextPanY, 'nextPanSpeedX:', nextPanSpeedX, 'nextPanSpeedY:', nextPanSpeedY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
 
                 push();
                 translate(x, y);
@@ -288,10 +290,26 @@ class Slideshow
 
         function switchImage() {
             currentIndex = (currentIndex + 1);
+
+				let wasFirstImage = isFirstImage;
+				isFirstImage = false;
+
+				if ( wasFirstImage )
+				{
+					imageDuration = 200;
+					console.log( "***3 imageDuration to " + imageDuration );
+				}
+				else
+				{
+					imageDuration = defaultImageDuration;
+					console.log( "***4 imageDuration to " + imageDuration );
+				}
+
             if (currentIndex === images.length - 1) {
                 isFinalImage = true;
                 fadeTime = finalFadeTime;
                 imageDuration = finalImageDuration;
+					 console.log( "***5 imageDuration to " + imageDuration );
                 pauseTime = finalPauseTime;
                 alphaStep = 255 / (fadeTime * 60 / 1000);
                 console.log('Switching to final image with custom timing:', 
@@ -302,6 +320,8 @@ class Slideshow
             if (currentIndex >= images.length) {
                 return;
             }
+
+
             currentImage = nextImage || currentImage;
             nextImage = currentIndex + 1 < images.length ? loadImage(images[currentIndex + 1]) : null;
             setNewPanDirection('current');
@@ -342,6 +362,12 @@ class Slideshow
             panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
             panSpeedX *= PANSPEED_SCALE;
             panSpeedY *= PANSPEED_SCALE;
+				if ( isFirstImage )
+				{
+					panSpeedX = 0;
+					panSpeedY = 0;
+				}
+				
             panX = -maxPanX * cos(panAngle);
             panY = -maxPanY * sin(panAngle);
 
