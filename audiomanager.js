@@ -6,8 +6,8 @@ class AudioManager
 	constructor( audioFolderPath )
 	{
 		this.audioFolderPath = audioFolderPath;
-		this.audioFiles = [];
-		this.audioIndex = 0;
+		this._audioFiles = [];
+		this._audioIndex = 0;
 	}
 
 	async init()
@@ -15,12 +15,12 @@ class AudioManager
 		try
 		{
 			// Load audio files
-			let audioFiles = await fs.promises.readdir( this.audioFolderPath );
-			audioFiles.sort( ( a, b ) => a.localeCompare( b, undefined, { sensitivity: 'base' } ) );
-			this.audioFiles = audioFiles
+			let _audioFiles = await fs.promises.readdir( this.audioFolderPath );
+			_audioFiles.sort( ( a, b ) => a.localeCompare( b, undefined, { sensitivity: 'base' } ) );
+			this._audioFiles = _audioFiles
 				.filter( file => file.toLowerCase().endsWith( '.mp3' ) )
 				.map( file => `file://${path.join( this.audioFolderPath, file ).replace( /\\/g, '/' )}` );
-			if ( this.audioFiles.length === 0 )
+			if ( this._audioFiles.length === 0 )
 			{
 				console.warn( 'No MP3 files found in the specified audio folder. Proceeding without audio.' );
 				return false;
@@ -37,15 +37,15 @@ class AudioManager
 	{
 		return `
             const audio = document.getElementById('backgroundAudio');
-            const audioFiles = ${JSON.stringify( this.audioFiles )};
-            let audioIndex = ${this.audioIndex};
+            const _audioFiles = ${JSON.stringify( this._audioFiles )};
+            let _audioIndex = ${this._audioIndex};
 
             function playNextAudio() {
-                if (audioFiles.length > 0) {
-                    audio.src = audioFiles[audioIndex];
+                if (_audioFiles.length > 0) {
+                    audio.src = _audioFiles[_audioIndex];
                     audio.play().catch(err => console.error('Audio play error:', err));
                     audio.onended = () => {
-                        audioIndex = (audioIndex + 1) % audioFiles.length; // Cycle to next audio or loop back
+                        _audioIndex = (_audioIndex + 1) % _audioFiles.length; // Cycle to next audio or loop back
                         playNextAudio();
                     };
                 }

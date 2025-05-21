@@ -76,7 +76,7 @@ class Slideshow
 		const secondToLastPauseTime = 200;
 		const scaleFactor = 1.05;
 		let PANSPEED_SCALE = 1.5;
-		const OLD_AUDIO_ENABLED = true;
+		const OLD_AUDIO_ENABLED = false;
 
 		// Disable the menu bar
 		// Menu.setApplicationMenu( null );
@@ -109,6 +109,7 @@ class Slideshow
     </style>
 </head>
 <body>
+    <audio id="backgroundAudio"></audio>
     <script>
 		     //               window.audioAPI.startPlayback(); // new
 
@@ -147,7 +148,6 @@ class Slideshow
 		  let isFirstImage = true;
         let isSlideshowActive = true;
 
-		// let audioScript = {this.audioManager.getAudioScript()};
 
 		function preload() {
             if (images.length > 0) {
@@ -460,6 +460,7 @@ class Slideshow
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
         }
+		${this.audioManager.getAudioScript()};
     </script>
 </body>
 </html>
