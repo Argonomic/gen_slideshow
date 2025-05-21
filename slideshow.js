@@ -55,8 +55,8 @@ class Slideshow
 
 	start()
 	{
-		const defaultFadeTime = 800;
-		const defaultImageDuration = 3800;
+		const defaultFadeTime = 800 * 1.333;
+		const defaultImageDuration = 3800 * 1.333; // * 0.1;
 		const finalFadeTime = 2000;
 		const finalImageDuration = 6000;
 		const finalPauseTime = 1000;
@@ -64,7 +64,7 @@ class Slideshow
 		const secondToLastImageDuration = 200;
 		const secondToLastPauseTime = 200;
 		const scaleFactor = 1.05;
-		let PANSPEED_SCALE = 0.5;
+		let PANSPEED_SCALE = 1.5;
 
 		// Disable the menu bar
 		// Menu.setApplicationMenu( null );
@@ -254,8 +254,9 @@ class Slideshow
                 let maxPanY = (imgH - height) / 4;
                 currentPanX += currentPanSpeedX;
                 currentPanY += currentPanSpeedY;
-                currentPanX = constrain(currentPanX, -maxPanX, maxPanX);
-                currentPanY = constrain(currentPanY, -maxPanY, maxPanY);
+					 // wip
+               //  currentPanX = constrain(currentPanX, -maxPanX, maxPanX);
+               //  currentPanY = constrain(currentPanY, -maxPanY, maxPanY); 
 
                 let x = width / 2 + currentPanX;
                 let y = height / 2 + currentPanY;
