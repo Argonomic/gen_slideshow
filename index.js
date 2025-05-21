@@ -1,8 +1,8 @@
 const { app, BrowserWindow, contextBridge, ipcMain } = require( 'electron' );
 const Slideshow = require( './slideshow.js' );
 
-const folderPath = 'd:/depots/gen_slideshow_download/images';
-const audioFolderPath = 'd:/depots/gen_slideshow_download/audio';
+const folderPath = 'd:/depots/gen_slideshow/images';
+const audioFolderPath = 'd:/depots/gen_slideshow/audio';
 const windowWidth = 1920 * ( 2 / 3 ) + 4;
 const windowHeight = 1080 * ( 2 / 3 ) + 4;
 

@@ -1,6 +1,8 @@
 const { BrowserWindow, Menu } = require( 'electron' );
 const fs = require( 'fs' );
 const path = require( 'path' );
+const AudioManager = require( './audioManager.js' );
+
 const windowWidth = 1920 * ( 2 / 3 ) + 4;
 const windowHeight = 1080 * ( 2 / 3 ) + 4;
 
@@ -15,6 +17,8 @@ class Slideshow
 		this.windowHeight = windowHeight;
 		this.images = [];
 		this.audioFiles = [];
+
+		this.audioManager = new AudioManager( audioFolderPath );
 		this.window = null;
 	}
 
@@ -45,6 +49,13 @@ class Slideshow
 				console.warn( 'No MP3 files found in the specified audio folder. Proceeding without audio.' );
 			}
 
+			// Initialize new audio
+			const audioSuccess = await this.audioManager.init();
+			if ( !audioSuccess )
+			{
+				console.warn( 'Audio initialization failed. Proceeding without audio.' );
+			}
+
 			return true;
 		} catch ( err )
 		{
@@ -65,6 +76,7 @@ class Slideshow
 		const secondToLastPauseTime = 200;
 		const scaleFactor = 1.05;
 		let PANSPEED_SCALE = 1.5;
+		const OLD_AUDIO_ENABLED = true;
 
 		// Disable the menu bar
 		// Menu.setApplicationMenu( null );
@@ -98,14 +110,17 @@ class Slideshow
 </head>
 <body>
     <script>
+		     //               window.audioAPI.startPlayback(); // new
+
         const images = ${JSON.stringify( this.images )};
-        const audioFiles = ${JSON.stringify( this.audioFiles )};
+        const audioFiles = ${JSON.stringify( this.audioFiles )}; // old
         const defaultFadeTime = ${defaultFadeTime};
         const defaultImageDuration = ${defaultImageDuration};
         const finalFadeTime = ${finalFadeTime};
         const finalImageDuration = ${finalImageDuration};
         const finalPauseTime = ${finalPauseTime};
         const secondToLastFadeTime =  ${secondToLastFadeTime};
+		const OLD_AUDIO_ENABLED = ${OLD_AUDIO_ENABLED};
         const secondToLastImageDuration =  ${secondToLastImageDuration};
         const secondToLastPauseTime		   =  ${secondToLastPauseTime};
         const scaleFactor = ${scaleFactor};
@@ -132,7 +147,9 @@ class Slideshow
 		  let isFirstImage = true;
         let isSlideshowActive = true;
 
-        function preload() {
+		// let audioScript = {this.audioManager.getAudioScript()};
+
+		function preload() {
             if (images.length > 0) {
                 currentImage = loadImage(images[0], 
                     () => console.log('Preload: Loaded image:', images[0]),
@@ -142,7 +159,8 @@ class Slideshow
                     nextImage = loadImage(images[1]);
                 }
             }
-            if (audioFiles.length > 0) {
+            if (audioFiles.length > 0 && OLD_AUDIO_ENABLED) {
+				console.log( "LEZZ PLAY DAT AUDIOSS" )
                 currentAudio = loadSound(audioFiles[0], 
                     () => console.log('Preload: Loaded audio:', audioFiles[0]),
                     err => console.error('Preload: Error loading audio:', audioFiles[0], err)
@@ -170,7 +188,7 @@ class Slideshow
             }
             currentAudio = loadSound(audioFiles[audioIndex], 
                 () => {
-                    if (isSlideshowActive) {
+                    if (isSlideshowActive && OLD_AUDIO_ENABLED) {
                         console.log('Playing audio:', audioFiles[audioIndex]);
                         currentAudio.play();
                         currentAudio.onended(() => {
@@ -446,6 +464,7 @@ class Slideshow
 </body>
 </html>
         `;
+
 
 		try
 		{

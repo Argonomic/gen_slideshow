@@ -14,18 +14,21 @@
 </head>
 <body>
     <script>
-        const images = ["file://d:/depots/gen_slideshow_download/images/001 intro.jpg","file://d:/depots/gen_slideshow_download/images/002 black.jpg","file://d:/depots/gen_slideshow_download/images/005.jpg","file://d:/depots/gen_slideshow_download/images/006.jpg","file://d:/depots/gen_slideshow_download/images/008_william.jpg","file://d:/depots/gen_slideshow_download/images/030_jack.jpg","file://d:/depots/gen_slideshow_download/images/033.jpg","file://d:/depots/gen_slideshow_download/images/080_ella.jpg","file://d:/depots/gen_slideshow_download/images/085.jpg","file://d:/depots/gen_slideshow_download/images/100_lainey.jpg","file://d:/depots/gen_slideshow_download/images/110_leo.jpg","file://d:/depots/gen_slideshow_download/images/120_naomi.jpg","file://d:/depots/gen_slideshow_download/images/125.jpg","file://d:/depots/gen_slideshow_download/images/128.jpg","file://d:/depots/gen_slideshow_download/images/135.jpg","file://d:/depots/gen_slideshow_download/images/150_matilda.jpg","file://d:/depots/gen_slideshow_download/images/162_olu.jpg","file://d:/depots/gen_slideshow_download/images/200_ryland.jpg","file://d:/depots/gen_slideshow_download/images/230_dawson.jpg","file://d:/depots/gen_slideshow_download/images/255.jpg","file://d:/depots/gen_slideshow_download/images/270.jpg","file://d:/depots/gen_slideshow_download/images/300_august.jpg","file://d:/depots/gen_slideshow_download/images/300_linly.jpg","file://d:/depots/gen_slideshow_download/images/310_IMG_1055.jpg","file://d:/depots/gen_slideshow_download/images/320_IMG_1639.jpg","file://d:/depots/gen_slideshow_download/images/321_IMG_1640.jpg","file://d:/depots/gen_slideshow_download/images/330_IMG_7575.jpg","file://d:/depots/gen_slideshow_download/images/350_florence.jpg","file://d:/depots/gen_slideshow_download/images/365.jpg","file://d:/depots/gen_slideshow_download/images/380_IMG_8710.jpg","file://d:/depots/gen_slideshow_download/images/400_jaimin.jpg","file://d:/depots/gen_slideshow_download/images/450_charlie.jpg","file://d:/depots/gen_slideshow_download/images/470_george.jpg","file://d:/depots/gen_slideshow_download/images/500_IMG_8080.jpg","file://d:/depots/gen_slideshow_download/images/520_khushi.jpg","file://d:/depots/gen_slideshow_download/images/525.jpg","file://d:/depots/gen_slideshow_download/images/530_IMG_7490.jpg","file://d:/depots/gen_slideshow_download/images/633.jpg","file://d:/depots/gen_slideshow_download/images/638_spencer.jpg","file://d:/depots/gen_slideshow_download/images/710_kinsey.jpg","file://d:/depots/gen_slideshow_download/images/715.jpg","file://d:/depots/gen_slideshow_download/images/720_IMG_1658.jpg","file://d:/depots/gen_slideshow_download/images/720.jpg","file://d:/depots/gen_slideshow_download/images/800_elise.jpg","file://d:/depots/gen_slideshow_download/images/870_IMG_3922.jpg","file://d:/depots/gen_slideshow_download/images/920_nicholas.jpg","file://d:/depots/gen_slideshow_download/images/925_140_IMG_0625.jpg","file://d:/depots/gen_slideshow_download/images/949 black.jpg","file://d:/depots/gen_slideshow_download/images/955.jpg"];
-        const audioFiles = ["file://d:/depots/gen_slideshow_download/audio/TALK - Afraid of the Dark (Audio).mp3"];
-        const defaultFadeTime = 800;
-        const defaultImageDuration = 3800;
+		     //               window.audioAPI.startPlayback(); // new
+
+        const images = ["file://d:/depots/gen_slideshow/images/001 intro.jpg","file://d:/depots/gen_slideshow/images/002 black.jpg","file://d:/depots/gen_slideshow/images/005.jpg","file://d:/depots/gen_slideshow/images/006.jpg","file://d:/depots/gen_slideshow/images/008_william.jpg","file://d:/depots/gen_slideshow/images/030_jack.jpg","file://d:/depots/gen_slideshow/images/033.jpg","file://d:/depots/gen_slideshow/images/080_ella.jpg","file://d:/depots/gen_slideshow/images/085.jpg","file://d:/depots/gen_slideshow/images/100_lainey.jpg","file://d:/depots/gen_slideshow/images/110_leo.jpg","file://d:/depots/gen_slideshow/images/120_naomi.jpg","file://d:/depots/gen_slideshow/images/125.jpg","file://d:/depots/gen_slideshow/images/128.jpg","file://d:/depots/gen_slideshow/images/135.jpg","file://d:/depots/gen_slideshow/images/150_matilda.jpg","file://d:/depots/gen_slideshow/images/162_olu.jpg","file://d:/depots/gen_slideshow/images/200_ryland.jpg","file://d:/depots/gen_slideshow/images/230_dawson.jpg","file://d:/depots/gen_slideshow/images/255.jpg","file://d:/depots/gen_slideshow/images/270.jpg","file://d:/depots/gen_slideshow/images/300_august.jpg","file://d:/depots/gen_slideshow/images/300_linly.jpg","file://d:/depots/gen_slideshow/images/310_IMG_1055.jpg","file://d:/depots/gen_slideshow/images/320_IMG_1639.jpg","file://d:/depots/gen_slideshow/images/321_IMG_1640.jpg","file://d:/depots/gen_slideshow/images/330_IMG_7575.jpg","file://d:/depots/gen_slideshow/images/350_florence.jpg","file://d:/depots/gen_slideshow/images/365.jpg","file://d:/depots/gen_slideshow/images/380_IMG_8710.jpg","file://d:/depots/gen_slideshow/images/400_jaimin.jpg","file://d:/depots/gen_slideshow/images/450_charlie.jpg","file://d:/depots/gen_slideshow/images/470_george.jpg","file://d:/depots/gen_slideshow/images/500_IMG_8080.jpg","file://d:/depots/gen_slideshow/images/520_khushi.jpg","file://d:/depots/gen_slideshow/images/525.jpg","file://d:/depots/gen_slideshow/images/530_IMG_7490.jpg","file://d:/depots/gen_slideshow/images/633.jpg","file://d:/depots/gen_slideshow/images/638_spencer.jpg","file://d:/depots/gen_slideshow/images/710_kinsey.jpg","file://d:/depots/gen_slideshow/images/715.jpg","file://d:/depots/gen_slideshow/images/720_IMG_1658.jpg","file://d:/depots/gen_slideshow/images/720.jpg","file://d:/depots/gen_slideshow/images/800_elise.jpg","file://d:/depots/gen_slideshow/images/870_IMG_3922.jpg","file://d:/depots/gen_slideshow/images/920_nicholas.jpg","file://d:/depots/gen_slideshow/images/925_140_IMG_0625.jpg","file://d:/depots/gen_slideshow/images/949 black.jpg","file://d:/depots/gen_slideshow/images/955.jpg"];
+        const audioFiles = ["file://d:/depots/gen_slideshow/audio/Randy Newman - You've Got a Friend in Me (From Toy Story 4Audio Only).mp3"]; // old
+        const defaultFadeTime = 1066.3999999999999;
+        const defaultImageDuration = 5065.4;
         const finalFadeTime = 2000;
         const finalImageDuration = 6000;
         const finalPauseTime = 1000;
         const secondToLastFadeTime =  200;
+		const OLD_AUDIO_ENABLED = true;
         const secondToLastImageDuration =  200;
         const secondToLastPauseTime		   =  200;
         const scaleFactor = 1.05;
-        let PANSPEED_SCALE = 0.5;
+        let PANSPEED_SCALE = 1.5;
         let currentImage;
         let nextImage;
         let currentAudio;
@@ -48,7 +51,9 @@
 		  let isFirstImage = true;
         let isSlideshowActive = true;
 
-        function preload() {
+		// let audioScript = {this.audioManager.getAudioScript()};
+
+		function preload() {
             if (images.length > 0) {
                 currentImage = loadImage(images[0], 
                     () => console.log('Preload: Loaded image:', images[0]),
@@ -58,7 +63,8 @@
                     nextImage = loadImage(images[1]);
                 }
             }
-            if (audioFiles.length > 0) {
+            if (audioFiles.length > 0 && OLD_AUDIO_ENABLED) {
+				console.log( "LEZZ PLAY DAT AUDIOSS" )
                 currentAudio = loadSound(audioFiles[0], 
                     () => console.log('Preload: Loaded audio:', audioFiles[0]),
                     err => console.error('Preload: Error loading audio:', audioFiles[0], err)
@@ -86,7 +92,7 @@
             }
             currentAudio = loadSound(audioFiles[audioIndex], 
                 () => {
-                    if (isSlideshowActive) {
+                    if (isSlideshowActive && OLD_AUDIO_ENABLED) {
                         console.log('Playing audio:', audioFiles[audioIndex]);
                         currentAudio.play();
                         currentAudio.onended(() => {
@@ -170,8 +176,9 @@
                 let maxPanY = (imgH - height) / 4;
                 currentPanX += currentPanSpeedX;
                 currentPanY += currentPanSpeedY;
-                currentPanX = constrain(currentPanX, -maxPanX, maxPanX);
-                currentPanY = constrain(currentPanY, -maxPanY, maxPanY);
+					 // wip
+               //  currentPanX = constrain(currentPanX, -maxPanX, maxPanX);
+               //  currentPanY = constrain(currentPanY, -maxPanY, maxPanY); 
 
                 let x = width / 2 + currentPanX;
                 let y = height / 2 + currentPanY;
