@@ -3,8 +3,8 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const AudioManager = require( './audioManager.js' );
 
-const windowWidth = 1920 * ( 2 / 3 ) + 4;
-const windowHeight = 1080 * ( 2 / 3 ) + 4;
+// const windowWidth = 1920 * ( 2 / 3 ) + 4;
+// const windowHeight = 1080 * ( 2 / 3 ) + 4;
 
 
 class Slideshow
@@ -69,15 +69,16 @@ class Slideshow
 		const FAST_INTRO = false;
 		const MULT = 1.0;
 		const defaultFadeTime = ( 800 * 1.0 ) * MULT;
-		const defaultImageDuration = ( 2330 + 220 ) * MULT; // ( 2330 + 240 ) * MULT;
+		const defaultImageDuration = ( 2330 + 220 + 700 ) * MULT; // ( 2330 + 240 ) * MULT;
 		const secondToLastFadeTime = 200;
 		const secondToLastImageDuration = 200;
 		const secondToLastPauseTime = 200;
 		const scaleFactor = 0.4; // 1.05;
 		let PANSPEED_SCALE = 0.5;
-		let ALTERNATE = -300;
+		let ALTERNATE = -300 * 0.3;
 		const OLD_AUDIO_ENABLED = false;
 		const NEW_AUDIO_ENABLED = true;
+		const PERSONAL_ENABLED = false;
 
 		// Disable the menu bar
 		// Menu.setApplicationMenu( null );
@@ -122,6 +123,7 @@ class Slideshow
         const secondToLastFadeTime =  ${secondToLastFadeTime};
 		const OLD_AUDIO_ENABLED = ${OLD_AUDIO_ENABLED};
 		const NEW_AUDIO_ENABLED = ${NEW_AUDIO_ENABLED};
+		const PERSONAL_ENABLED = ${PERSONAL_ENABLED};		
         const secondToLastImageDuration =  ${secondToLastImageDuration};
         const secondToLastPauseTime		   =  ${secondToLastPauseTime};
         const scaleFactor = ${scaleFactor};
@@ -153,117 +155,80 @@ class Slideshow
 		let angleIndex = 0;
 		let angles = [
 			
-			0, // intro
+			0, // black screen
 
-			// allie
-			1.1328128513496225, 
-			5.627222058910939,  // maybe fix overlap
-			0.7408116605321027, 
-			
-			// august
+			// 1
+			0.1 // 1.1328128513496225, 
+			// 2
+			5.627222058910939,
+			// 3
+			0.0,
+			// 4
 			1.5908302596333452, 
+			// 5
 			2.355196958215871, 
+			// 6
 			5.7159306747722938,
-			
-			// charlie
-			2.624366046866113, 
+			// 7
+			0.0, 
+			// 8
 			1.2599736763402498, 
-			0.1393499871660995, // push out a bit to the left?  // 0.8393499871660995, // push out a bit to the left? 
-			
-			// dawson
+			// 9
+			0.1393499871660995,
+			// 10
 			1.271983183588195, 
+			// 11
 			3.8340514250170651, 
+			// 12
 			0.991458619971771, 
-			
-			// elise
-			3.7450459812105206,  
+			// 13
+			0.0, // 3.7450459812105206,  
+			// 14
 			1.85717875157505, 
+			// 15
 			3.6277446855814743,
-			
-			// ella
+			// 16
 			1.09429879134978553, 
-			3.97330752116559, 
+			// 17
+			0.0, // 3.97330752116559, 
+			// 18
 			4.906361185085047, 
-			
-			// florence
+			// 19
 			1.949627383241286,
+			// 20
 			6.207538973606385, 
+			// 21
 			4.664837733761826, 
 			
-			// george
+			0.0,
+			
+			// 22
 			0.9673177948605645, 
+			// 23
 			2.759786645166142, 
-			5.10903091809768686, // 3.10903091809768686, 
+			// 24
+			5.10903091809768686,
 
-			// jack
+			2.759786645166142,  // black screen
+
+			
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			// 25
 			0.9077026323558282, 
+			// 26inal
+			
 			0.5755051317961674, 
+			// 27
 			4.445124816868618, 
-
-			// jaimin
+			// 28
 			1.1234769935895645, 
+			// 29
 			1.376347463418245, 
+			// 30
 			0.5427511040870574, 
-
-			// khushi
+			// 31
 			2.5704497756635276, 
-			0.2537633162564111, 
-			4.859970098714183,
 
-			// kinsey
-			0.8199494650911996,
-			2.580212368228481, 
-			3.748572423408948, 
-
-			// lainey
-			4.542229816677456, 
-			0.2537633162564111, 
-			5.3741188239300035, 
-
-			// leo
-			4.734727630971292, 
-			1.8293759752188661,
-			1.610347038106177, 
-
-			// linly
-			2.068418954339531, 
-			5.259825421263206,
-			1.261502342642173, 
-
-			// matilda
-			5.337361865809745, 
-			2.068418954339531, 
-			4.008512307724525, 
-
-			// naomi
-			1.872948294615419,  // swap #1 and #2  
-			5.1951734496561937,
-			2.1953111155025478, 
-
-			// nich
-			2.9790893770367353, 
-			5.172830276540797, // 2.172830276540797, 
-			1.347414474126533, 
-
-			// olu
-			0.09192543600446, 
-			5.790926008729001, // swap #2 and #3
-			3.834695848281068, 
-
-			// ryland
-			0.8199494650911996,
-			0.4537633162564111, 
-			4.9965324544079333, 
-
-			// spencer
-			1.2290334012423494, 
-			5.385676033618444,  // ****
-			4.2537633162564111, 
-
-			// william
-			2.580212368228481, 
-			3.748572423408948, 
-			4.542229816677456, 
 		]
 
 
@@ -326,7 +291,14 @@ class Slideshow
             if (phase === 'fadeIn') 
 			{
                 currentAlpha = min(currentAlpha + alphaStep, 255);
-				if ( personalImageTracker == 1 && elapsed >= fadeTime + 650 || personalImageTracker != 1 && currentAlpha >= 255 )
+
+				let doIt = false
+				if ( PERSONAL_ENABLED )
+					doIt = ( personalImageTracker == 1 && elapsed >= fadeTime + 650 || personalImageTracker != 1 && currentAlpha >= 255 );
+				else
+					doIt = fadeTime + 150;
+
+				if ( doIt )
 				{
                     currentAlpha = 255;
                     phase = 'secondImage_FadeIn';
@@ -335,8 +307,12 @@ class Slideshow
             } 
 			else if (phase === 'secondImage_FadeIn') 
 			{
-				currentAlpha = 255;
-                if (nextImage)
+				if ( currentPanAngle == 0.0 )
+					currentAlpha = max(currentAlpha - alphaStep, 0);
+				else
+					currentAlpha = 255;				
+
+				if (nextImage)
 				{
                     nextAlpha = min(nextAlpha + alphaStep, 255);
 					if ( nextAlpha >= 255 )
@@ -348,13 +324,17 @@ class Slideshow
             } 
 			else if (phase === 'crossfade_PLAY') 
 			{
-				currentAlpha = 255;
+				if ( currentPanAngle == 0.0 )
+					currentAlpha = 0;
+				else
+					currentAlpha = 255;
+
                 if (nextImage) 
 				{
 					nextAlpha = 255;
                 }
 
-				if ( personalImageTracker >= 2 )
+				if ( personalImageTracker >= 2 && PERSONAL_ENABLED )
 				{
 					if (elapsed >= imageDuration * 1.35 )
 					{
@@ -364,7 +344,17 @@ class Slideshow
 				}
 				else
 				{
-					if (elapsed >= imageDuration * 2.0 )
+					let _next = false
+					let imageDur = imageDuration
+					if ( currentPanAngle == 0.0 )
+						imageDur *= 2.0;
+
+					if ( PERSONAL_ENABLED )
+						next = elapsed >= imageDur * 2.0;
+					else
+						next = elapsed >= imageDur * 1.0;
+					
+					if ( next )
 					{
 						personalImageTracker += 1;
 						phase = 'crossfade_OUT';
@@ -461,6 +451,7 @@ class Slideshow
 
                 let x = width / 2 + currentPanX;
                 let y = height / 2 + currentPanY;
+				// console.log( "X = " + x )
 
                //  console.log('Draw: currentPanX:', currentPanX, 'currentPanY:', currentPanY, 'currentPanSpeedX:', currentPanSpeedX, 'currentPanSpeedY:', currentPanSpeedY, 'maxPanX:', maxPanX, 'maxPanY:', maxPanY);
 
@@ -468,6 +459,13 @@ class Slideshow
                 translate(x, y);
                 imageMode(CENTER);
                 tint(255, currentAlpha);
+
+				if ( currentPanAngle == 0.0 )
+				{
+					imgW *= 1.5;
+					imgH *= 1.5;
+				}
+
                 image(currentImage, 0, 0, imgW, imgH);
                 pop();
             }
@@ -503,7 +501,14 @@ class Slideshow
                 translate(x, y);
                 imageMode(CENTER);
                 tint(255, nextAlpha);
-                image(nextImage, 0, 0, imgW, imgH);
+
+				if ( nextPanAngle == 0.0 )
+				{
+					imgW *= 1.5;
+					imgH *= 1.5;
+				}
+
+				image(nextImage, 0, 0, imgW, imgH);
                 pop();
             }
         }
@@ -524,9 +529,7 @@ class Slideshow
 			}
 
 			if (currentIndex >= images.length) 
-			{
 				return;
-			}
 
             currentImage = nextImage || currentImage;
             nextImage = currentIndex + 1 < images.length ? loadImage(images[currentIndex + 1]) : null;
@@ -604,6 +607,13 @@ class Slideshow
 			// panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
             panSpeedX *= PANSPEED_SCALE;
             panSpeedY *= PANSPEED_SCALE;
+
+			if ( panAngle == 0.0 )
+			{
+				panSpeedX = 0.0;
+				panSpeedY = 0.0; 
+			}
+
 			if ( Math.abs( panSpeedY ) > 2.0 )
 				panSpeedY *= 0.5;
 
@@ -612,12 +622,24 @@ class Slideshow
             panX = -maxPanX * cos(panAngle);
 			// console.log ( "ALTERNATE " + ALTERNATE + ", panX " + panX )
 
-			if ( ALTERNATE < 0 )
-				panX += ALTERNATE * 0.8;
+			if ( panAngle == 0.0 )
+			{
+				panX = 0; // imgW - width;
+				panY = 0; // imgH - height;
+				// nextPanX = panX;
+				// nextPanY = panY;
+				panSpeedX = 0;
+				panSpeedY = 0;
+			}
 			else
-				panX += ALTERNATE * 0.8;
+			{
+				if ( ALTERNATE < 0 )
+					panX += ALTERNATE * 0.8;
+				else
+					panX += ALTERNATE * 0.8;
 
-            panY = -maxPanY * sin(panAngle);
+				panY = -maxPanY * sin(panAngle);
+			}
 
             if (type === 'current') {
                 currentPanAngle = panAngle;
