@@ -66,8 +66,9 @@ class Slideshow
 
 	start()
 	{
-		const defaultFadeTime = 800 * 1.333;
-		const defaultImageDuration = 3800 * 1.333; // * 0.1;
+		const FAST_INTRO = false;
+		const defaultFadeTime = 800 * 1.0;
+		const defaultImageDuration = 3600 - 2500; // * 0.1;
 		const finalFadeTime = 2000;
 		const finalImageDuration = 6000;
 		const finalPauseTime = 1000;
@@ -77,6 +78,7 @@ class Slideshow
 		const scaleFactor = 1.05;
 		let PANSPEED_SCALE = 1.5;
 		const OLD_AUDIO_ENABLED = false;
+		const NEW_AUDIO_ENABLED = true;
 
 		// Disable the menu bar
 		// Menu.setApplicationMenu( null );
@@ -84,7 +86,7 @@ class Slideshow
 		this.window = new BrowserWindow( {
 			width: this.windowWidth,
 			height: this.windowHeight,
-			frame: false,
+			frame: true, // toggle for title bar
 			resizable: false,
 			transparent: false,
 			webPreferences: {
@@ -113,6 +115,7 @@ class Slideshow
     <script>
 		     //               window.audioAPI.startPlayback(); // new
 
+		const FAST_INTRO = ${FAST_INTRO};
         const images = ${JSON.stringify( this.images )};
         const audioFiles = ${JSON.stringify( this.audioFiles )}; // old
         const defaultFadeTime = ${defaultFadeTime};
@@ -122,6 +125,7 @@ class Slideshow
         const finalPauseTime = ${finalPauseTime};
         const secondToLastFadeTime =  ${secondToLastFadeTime};
 		const OLD_AUDIO_ENABLED = ${OLD_AUDIO_ENABLED};
+		const NEW_AUDIO_ENABLED = ${NEW_AUDIO_ENABLED};
         const secondToLastImageDuration =  ${secondToLastImageDuration};
         const secondToLastPauseTime		   =  ${secondToLastPauseTime};
         const scaleFactor = ${scaleFactor};
@@ -340,37 +344,44 @@ class Slideshow
 					console.log( "***4 imageDuration to " + imageDuration );
 				}
 
-				if (currentIndex === images.length - 1) {
-                isFinalImage = true;
-                fadeTime = finalFadeTime;
-                imageDuration = finalImageDuration;
-                console.log( "***5 imageDuration to " + imageDuration );
-                pauseTime = finalPauseTime;
-                alphaStep = 255 / (fadeTime * 60 / 1000);
-                panSpeedX = 0;
-                panSpeedY = 0;
-					 console.log( "--8 panspeed to " + panSpeedX )
-					 
-					 console.log( "*********** FINAL IMAGE *********" )
-					 PANSPEED_SCALE = 0;
-					 currentPanSpeedX = 0;
-					 currentPanSpeedY = 0;
-					 nextPanSpeedX = 0;
-					 nextPanSpeedY = 0;
-                console.log('Switching to final image with custom timing:', 
-                    'fadeTime:', fadeTime, 
-                    'imageDuration:', imageDuration, 
-                    'pauseTime:', pauseTime);
-            }
+				if ( FAST_INTRO && isFirstImage )
+				{
+					imageDuration = 100; // temp
+					console.log( "***4.5 imageDuration to " + imageDuration );
+				}
+
+				if (currentIndex === images.length - 1) 
+				{
+					isFinalImage = true;
+					fadeTime = finalFadeTime;
+					imageDuration = finalImageDuration;
+					console.log( "***5 imageDuration to " + imageDuration );
+					pauseTime = finalPauseTime;
+					alphaStep = 255 / (fadeTime * 60 / 1000);
+					panSpeedX = 0;
+					panSpeedY = 0;
+					console.log( "--8 panspeed to " + panSpeedX )
+
+					console.log( "*********** FINAL IMAGE *********" )
+					PANSPEED_SCALE = 0;
+					currentPanSpeedX = 0;
+					currentPanSpeedY = 0;
+					nextPanSpeedX = 0;
+					nextPanSpeedY = 0;
+					console.log('Switching to final image with custom timing:', 
+						'fadeTime:', fadeTime, 
+						'imageDuration:', imageDuration, 
+						'pauseTime:', pauseTime);
+	            }
 
 				if ( currentIndex === images.length - 2 )
 				{
 				    isSecondToLastImage = true;
-                fadeTime = secondToLastFadeTime;
-                imageDuration = secondToLastImageDuration;
-                pauseTime = secondToLastPauseTime;
-                console.log( "***6 imageDuration to " + imageDuration );
-				}
+					fadeTime = secondToLastFadeTime;
+					imageDuration = secondToLastImageDuration;
+					pauseTime = secondToLastPauseTime;
+					console.log( "***6 imageDuration to " + imageDuration );
+					}
 
 				if (currentIndex >= images.length) {
                 return;
@@ -460,7 +471,12 @@ class Slideshow
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
         }
-		${this.audioManager.getAudioScript()};
+
+		if ( NEW_AUDIO_ENABLED )
+		{
+			${this.audioManager.getAudioScript()};
+		}
+
     </script>
 </body>
 </html>

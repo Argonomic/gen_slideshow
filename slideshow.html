@@ -17,15 +17,17 @@
     <script>
 		     //               window.audioAPI.startPlayback(); // new
 
-        const images = ["file://d:/depots/gen_slideshow/images/001 intro.jpg","file://d:/depots/gen_slideshow/images/002 black.jpg","file://d:/depots/gen_slideshow/images/005.jpg","file://d:/depots/gen_slideshow/images/006.jpg","file://d:/depots/gen_slideshow/images/008_william.jpg","file://d:/depots/gen_slideshow/images/030_jack.jpg","file://d:/depots/gen_slideshow/images/033.jpg","file://d:/depots/gen_slideshow/images/080_ella.jpg","file://d:/depots/gen_slideshow/images/085.jpg","file://d:/depots/gen_slideshow/images/100_lainey.jpg","file://d:/depots/gen_slideshow/images/110_leo.jpg","file://d:/depots/gen_slideshow/images/120_naomi.jpg","file://d:/depots/gen_slideshow/images/125.jpg","file://d:/depots/gen_slideshow/images/128.jpg","file://d:/depots/gen_slideshow/images/135.jpg","file://d:/depots/gen_slideshow/images/150_matilda.jpg","file://d:/depots/gen_slideshow/images/162_olu.jpg","file://d:/depots/gen_slideshow/images/200_ryland.jpg","file://d:/depots/gen_slideshow/images/230_dawson.jpg","file://d:/depots/gen_slideshow/images/255.jpg","file://d:/depots/gen_slideshow/images/270.jpg","file://d:/depots/gen_slideshow/images/300_august.jpg","file://d:/depots/gen_slideshow/images/300_linly.jpg","file://d:/depots/gen_slideshow/images/310_IMG_1055.jpg","file://d:/depots/gen_slideshow/images/320_IMG_1639.jpg","file://d:/depots/gen_slideshow/images/321_IMG_1640.jpg","file://d:/depots/gen_slideshow/images/330_IMG_7575.jpg","file://d:/depots/gen_slideshow/images/350_florence.jpg","file://d:/depots/gen_slideshow/images/365.jpg","file://d:/depots/gen_slideshow/images/380_IMG_8710.jpg","file://d:/depots/gen_slideshow/images/400_jaimin.jpg","file://d:/depots/gen_slideshow/images/450_charlie.jpg","file://d:/depots/gen_slideshow/images/470_george.jpg","file://d:/depots/gen_slideshow/images/500_IMG_8080.jpg","file://d:/depots/gen_slideshow/images/520_khushi.jpg","file://d:/depots/gen_slideshow/images/525.jpg","file://d:/depots/gen_slideshow/images/530_IMG_7490.jpg","file://d:/depots/gen_slideshow/images/633.jpg","file://d:/depots/gen_slideshow/images/638_spencer.jpg","file://d:/depots/gen_slideshow/images/710_kinsey.jpg","file://d:/depots/gen_slideshow/images/715.jpg","file://d:/depots/gen_slideshow/images/720_IMG_1658.jpg","file://d:/depots/gen_slideshow/images/720.jpg","file://d:/depots/gen_slideshow/images/800_elise.jpg","file://d:/depots/gen_slideshow/images/870_IMG_3922.jpg","file://d:/depots/gen_slideshow/images/920_nicholas.jpg","file://d:/depots/gen_slideshow/images/925_140_IMG_0625.jpg","file://d:/depots/gen_slideshow/images/949 black.jpg","file://d:/depots/gen_slideshow/images/955.jpg"];
+		const FAST_INTRO = false;
+        const images = ["file://d:/depots/gen_slideshow/images/001 intro.jpg","file://d:/depots/gen_slideshow/images/002 black.jpg","file://d:/depots/gen_slideshow/images/1100 allie  (1).jpg","file://d:/depots/gen_slideshow/images/1100 allie  (2).jpg","file://d:/depots/gen_slideshow/images/1100 allie  (3).jpg","file://d:/depots/gen_slideshow/images/1110 august  (1).jpg","file://d:/depots/gen_slideshow/images/1110 august  (2).jpg","file://d:/depots/gen_slideshow/images/1110 august  (3).jpg","file://d:/depots/gen_slideshow/images/1120 charlie  (3).jpg","file://d:/depots/gen_slideshow/images/1120 charlie  (4).jpg","file://d:/depots/gen_slideshow/images/1120 charlie  (5).jpg","file://d:/depots/gen_slideshow/images/1130 dawson  (1).jpg","file://d:/depots/gen_slideshow/images/1130 dawson  (2).jpg","file://d:/depots/gen_slideshow/images/1130 dawson  (3).jpg","file://d:/depots/gen_slideshow/images/1140 elise 3 (1).jpg","file://d:/depots/gen_slideshow/images/1140 elise 3 (2).jpg","file://d:/depots/gen_slideshow/images/1140 elise 3 (3).jpg","file://d:/depots/gen_slideshow/images/1150 ella 3 (1).jpg","file://d:/depots/gen_slideshow/images/1150 ella 3 (2).jpg","file://d:/depots/gen_slideshow/images/1150 ella 3 (3).jpg","file://d:/depots/gen_slideshow/images/1160 flo 1.jpg","file://d:/depots/gen_slideshow/images/1160 flo 2.jpg","file://d:/depots/gen_slideshow/images/1160 flo 3.jpg","file://d:/depots/gen_slideshow/images/1170_george 1.jpg","file://d:/depots/gen_slideshow/images/1170_george 2.jpg","file://d:/depots/gen_slideshow/images/1170_george 3.jpg","file://d:/depots/gen_slideshow/images/1180 jack 1.jpg","file://d:/depots/gen_slideshow/images/1180 jack 2.jpg","file://d:/depots/gen_slideshow/images/1180 jack 3.jpg","file://d:/depots/gen_slideshow/images/1190 jaimin 1.jpg","file://d:/depots/gen_slideshow/images/1190 jaimin 2.jpg","file://d:/depots/gen_slideshow/images/1190 jaimin 3.jpg","file://d:/depots/gen_slideshow/images/1200 khushi 1.jpg","file://d:/depots/gen_slideshow/images/1200 khushi 2.jpg","file://d:/depots/gen_slideshow/images/1200 khushi 3.jpg","file://d:/depots/gen_slideshow/images/1210 kinsey 1.jpg","file://d:/depots/gen_slideshow/images/1210 kinsey 2.jpg","file://d:/depots/gen_slideshow/images/1210 kinsey 3.jpg","file://d:/depots/gen_slideshow/images/1220 lainey 1.jpg","file://d:/depots/gen_slideshow/images/1220 lainey 2.jpg","file://d:/depots/gen_slideshow/images/1220 lainey 3.jpg","file://d:/depots/gen_slideshow/images/1230 leo 1.jpg","file://d:/depots/gen_slideshow/images/1230 leo 2.jpg","file://d:/depots/gen_slideshow/images/1230 leo 3.jpg","file://d:/depots/gen_slideshow/images/1240 linly 1.jpg","file://d:/depots/gen_slideshow/images/1240 linly 2.jpg","file://d:/depots/gen_slideshow/images/1240 linly 3.jpg","file://d:/depots/gen_slideshow/images/1250 matilda 1.jpg","file://d:/depots/gen_slideshow/images/1250 matilda 2.jpg","file://d:/depots/gen_slideshow/images/1250 matilda 3.jpg","file://d:/depots/gen_slideshow/images/1260 naomi 1.jpg","file://d:/depots/gen_slideshow/images/1260 naomi 2.jpg","file://d:/depots/gen_slideshow/images/1260 naomi 3.jpg","file://d:/depots/gen_slideshow/images/1270 nicholas 1.jpg","file://d:/depots/gen_slideshow/images/1270 nicholas 2.jpg","file://d:/depots/gen_slideshow/images/1270 nicholas 3.jpg","file://d:/depots/gen_slideshow/images/1280 olu 1.jpg","file://d:/depots/gen_slideshow/images/1280 olu 2.jpg","file://d:/depots/gen_slideshow/images/1280 olu 3.jpg","file://d:/depots/gen_slideshow/images/1290 ryland 1.jpg","file://d:/depots/gen_slideshow/images/1290 ryland 2.jpg","file://d:/depots/gen_slideshow/images/1290 ryland 3.jpg","file://d:/depots/gen_slideshow/images/1300 spencer 1.jpg","file://d:/depots/gen_slideshow/images/1300 spencer 2.jpg","file://d:/depots/gen_slideshow/images/1300 spencer 3.jpg","file://d:/depots/gen_slideshow/images/1310 william 1.jpg","file://d:/depots/gen_slideshow/images/1310 william 2.jpg","file://d:/depots/gen_slideshow/images/1310 william 3.jpg","file://d:/depots/gen_slideshow/images/1999 transition.jpg","file://d:/depots/gen_slideshow/images/2005.jpg","file://d:/depots/gen_slideshow/images/2006.jpg","file://d:/depots/gen_slideshow/images/2033.jpg","file://d:/depots/gen_slideshow/images/2085.jpg","file://d:/depots/gen_slideshow/images/2090.jpg","file://d:/depots/gen_slideshow/images/2095.jpg","file://d:/depots/gen_slideshow/images/2125.jpg","file://d:/depots/gen_slideshow/images/2126.jpg","file://d:/depots/gen_slideshow/images/2128.jpg","file://d:/depots/gen_slideshow/images/2255.jpg","file://d:/depots/gen_slideshow/images/2270.jpg","file://d:/depots/gen_slideshow/images/2310.jpg","file://d:/depots/gen_slideshow/images/2315.jpg","file://d:/depots/gen_slideshow/images/2320.jpg","file://d:/depots/gen_slideshow/images/2321.jpg","file://d:/depots/gen_slideshow/images/2330.jpg","file://d:/depots/gen_slideshow/images/2333.jpg","file://d:/depots/gen_slideshow/images/2365.jpg","file://d:/depots/gen_slideshow/images/2380.jpg","file://d:/depots/gen_slideshow/images/2500.jpg","file://d:/depots/gen_slideshow/images/2525.jpg","file://d:/depots/gen_slideshow/images/2530.jpg","file://d:/depots/gen_slideshow/images/2633.jpg","file://d:/depots/gen_slideshow/images/2715.jpg","file://d:/depots/gen_slideshow/images/2716.jpg","file://d:/depots/gen_slideshow/images/2720.jpg","file://d:/depots/gen_slideshow/images/2730.jpg","file://d:/depots/gen_slideshow/images/2870.jpg","file://d:/depots/gen_slideshow/images/2925.jpg","file://d:/depots/gen_slideshow/images/2952 message.jpg","file://d:/depots/gen_slideshow/images/2953 black.jpg","file://d:/depots/gen_slideshow/images/2955 final.jpg"];
         const audioFiles = ["file://d:/depots/gen_slideshow/audio/001 TALK - Afraid of the Dark (Audio).mp3","file://d:/depots/gen_slideshow/audio/002 Randy Newman - You've Got a Friend in Me (From Toy Story 4Audio Only).mp3"]; // old
-        const defaultFadeTime = 1066.3999999999999;
-        const defaultImageDuration = 5065.4;
+        const defaultFadeTime = 800;
+        const defaultImageDuration = 1100;
         const finalFadeTime = 2000;
         const finalImageDuration = 6000;
         const finalPauseTime = 1000;
         const secondToLastFadeTime =  200;
 		const OLD_AUDIO_ENABLED = false;
+		const NEW_AUDIO_ENABLED = true;
         const secondToLastImageDuration =  200;
         const secondToLastPauseTime		   =  200;
         const scaleFactor = 1.05;
@@ -244,37 +246,44 @@
 					console.log( "***4 imageDuration to " + imageDuration );
 				}
 
-				if (currentIndex === images.length - 1) {
-                isFinalImage = true;
-                fadeTime = finalFadeTime;
-                imageDuration = finalImageDuration;
-                console.log( "***5 imageDuration to " + imageDuration );
-                pauseTime = finalPauseTime;
-                alphaStep = 255 / (fadeTime * 60 / 1000);
-                panSpeedX = 0;
-                panSpeedY = 0;
-					 console.log( "--8 panspeed to " + panSpeedX )
-					 
-					 console.log( "*********** FINAL IMAGE *********" )
-					 PANSPEED_SCALE = 0;
-					 currentPanSpeedX = 0;
-					 currentPanSpeedY = 0;
-					 nextPanSpeedX = 0;
-					 nextPanSpeedY = 0;
-                console.log('Switching to final image with custom timing:', 
-                    'fadeTime:', fadeTime, 
-                    'imageDuration:', imageDuration, 
-                    'pauseTime:', pauseTime);
-            }
+				if ( FAST_INTRO && isFirstImage )
+				{
+					imageDuration = 100; // temp
+					console.log( "***4.5 imageDuration to " + imageDuration );
+				}
+
+				if (currentIndex === images.length - 1) 
+				{
+					isFinalImage = true;
+					fadeTime = finalFadeTime;
+					imageDuration = finalImageDuration;
+					console.log( "***5 imageDuration to " + imageDuration );
+					pauseTime = finalPauseTime;
+					alphaStep = 255 / (fadeTime * 60 / 1000);
+					panSpeedX = 0;
+					panSpeedY = 0;
+					console.log( "--8 panspeed to " + panSpeedX )
+
+					console.log( "*********** FINAL IMAGE *********" )
+					PANSPEED_SCALE = 0;
+					currentPanSpeedX = 0;
+					currentPanSpeedY = 0;
+					nextPanSpeedX = 0;
+					nextPanSpeedY = 0;
+					console.log('Switching to final image with custom timing:', 
+						'fadeTime:', fadeTime, 
+						'imageDuration:', imageDuration, 
+						'pauseTime:', pauseTime);
+	            }
 
 				if ( currentIndex === images.length - 2 )
 				{
 				    isSecondToLastImage = true;
-                fadeTime = secondToLastFadeTime;
-                imageDuration = secondToLastImageDuration;
-                pauseTime = secondToLastPauseTime;
-                console.log( "***6 imageDuration to " + imageDuration );
-				}
+					fadeTime = secondToLastFadeTime;
+					imageDuration = secondToLastImageDuration;
+					pauseTime = secondToLastPauseTime;
+					console.log( "***6 imageDuration to " + imageDuration );
+					}
 
 				if (currentIndex >= images.length) {
                 return;
@@ -364,7 +373,10 @@
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
         }
-		
+
+		if ( NEW_AUDIO_ENABLED )
+		{
+			
             const audio = document.getElementById('backgroundAudio');
             const _audioFiles = ["file://d:/depots/gen_slideshow/audio/001 TALK - Afraid of the Dark (Audio).mp3","file://d:/depots/gen_slideshow/audio/002 Randy Newman - You've Got a Friend in Me (From Toy Story 4Audio Only).mp3"];
             let _audioIndex = 0;
@@ -386,6 +398,8 @@
                 }
             };
         ;
+		}
+
     </script>
 </body>
 </html>
