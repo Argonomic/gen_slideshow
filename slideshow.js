@@ -69,13 +69,13 @@ class Slideshow
 		const FAST_INTRO = false;
 		const MULT = 1.0;
 		const defaultFadeTime = ( 800 * 1.0 ) * MULT;
-		const defaultImageDuration = ( 2330 + 220 + 700 ) * MULT; // ( 2330 + 240 ) * MULT;
+		const defaultImageDuration = ( 2330 + 220 + 590 ) * MULT; // ( 2330 + 240 ) * MULT;
 		const secondToLastFadeTime = 200;
 		const secondToLastImageDuration = 200;
 		const secondToLastPauseTime = 200;
 		const scaleFactor = 0.4; // 1.05;
 		let PANSPEED_SCALE = 0.5;
-		let ALTERNATE = -300 * 0.3;
+		let ALTERNATE = -300; // * 0.3;
 		const OLD_AUDIO_ENABLED = false;
 		const NEW_AUDIO_ENABLED = true;
 		const PERSONAL_ENABLED = false;
@@ -154,66 +154,75 @@ class Slideshow
 
 		let angleIndex = 0;
 		let angles = [
-			
-			0, // black screen
 
-			// 1
-			0.1 // 1.1328128513496225, 
-			// 2
-			5.627222058910939,
-			// 3
-			0.0,
-			// 4
-			1.5908302596333452, 
-			// 5
-			2.355196958215871, 
-			// 6
-			5.7159306747722938,
-			// 7
+		
+			// 0.0, 
+			// 0.0, 
+			// 1.0,
+			// 5.0,
+			
+			// 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+
+			// tweak scalefactor
+
+
 			0.0, 
-			// 8
-			1.2599736763402498, 
-			// 9
-			0.1393499871660995,
-			// 10
-			1.271983183588195, 
-			// 11
-			3.8340514250170651, 
-			// 12
-			0.991458619971771, 
-			// 13
-			0.0, // 3.7450459812105206,  
-			// 14
-			1.85717875157505, 
-			// 15
-			3.6277446855814743,
-			// 16
-			1.09429879134978553, 
-			// 17
-			0.0, // 3.97330752116559, 
-			// 18
-			4.906361185085047, 
-			// 19
-			1.949627383241286,
-			// 20
-			6.207538973606385, 
-			// 21
-			4.664837733761826, 
-			
-			0.0,
-			
-			// 22
-			0.9673177948605645, 
-			// 23
-			2.759786645166142, 
-			// 24
-			5.10903091809768686,
+			0.0, 
 
-			2.759786645166142,  // black screen
-
+			5.355196958215871, // ella spencer
+	
+			3.1,	// 3 kids
 			
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			// 25
+			5.627222058910939, // 4 girls
+			
+			2.355196958215871,  // 5 kids
+			
+			1.5908302596333452, // 3 kids w hats
+			
+			2.355196958215871, // group on the floor
+			
+			5.7159306747722938, // spencer elise
+			
+			1.2599736763402498, // 3 boys
+			
+			0.1393499871660995, // george nich
+			
+			0.01 // 5.5, // 1.271983183588195, // 3 girls
+			
+			0.18340514250170651, // 3 on floor
+			
+			0.0, // group inside sitting
+			
+			0.0, // group inside standing
+			
+			1.85717875157505,  // 2 kids farm
+			
+			3.6277446855814743, // 5 kids outside
+			
+			2.5234 // 0.906361185085047, // 4.906361185085047  // 2 inside
+
+			0.0, // group steps
+
+			1.949627383241286, // climbing
+			
+			5.907538973606385, // climbing
+			
+			4.664837733761826, // feet together
+
+			0.6277446855814743, // 4.6 // peace
+
+			0.011, // 0.9673177948605645,  // zoo
+
+			2.759786645166142,  // teach
+			
+			6.23 // 5.10903091809768686, // outside kids
+			
+			0.0, // group
+			
+			0.0, 
+			
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			
 			0.9077026323558282, 
 			// 26inal
 			
@@ -352,7 +361,12 @@ class Slideshow
 					if ( PERSONAL_ENABLED )
 						next = elapsed >= imageDur * 2.0;
 					else
+					{
+						// if ( currentIndex === images.length - 3 )
+						// else
+						// 	next = elapsed >= imageDur * 1.0;
 						next = elapsed >= imageDur * 1.0;
+					}
 					
 					if ( next )
 					{
@@ -365,10 +379,24 @@ class Slideshow
 			{
                 currentAlpha = max(currentAlpha - alphaStep, 0);
 
+				let done = false
+				if ( currentIndex === images.length - 1 )
+				{
+	                if (currentAlpha <= 0)
+					{
+		                nextAlpha = max(nextAlpha - alphaStep, 0);
+						if ( nextAlpha <= 0 )
+							done = true
+					}
+				}
+				else
+					done = true
+
+
                 if ( nextImage )
 					nextAlpha = 255;
 
-                if (currentAlpha <= 0) 
+                if ( done && currentAlpha <= 0 )
 				{
 					switchImage();
 		            // setNewPanDirection('current');
@@ -519,14 +547,21 @@ class Slideshow
 
 			imageDuration = defaultImageDuration;
 
-			if ( currentIndex === images.length - 2 )
+			if ( currentIndex === images.length - 1 )
 			{
-				isSecondToLastImage = true;
-				fadeTime = secondToLastFadeTime;
-				imageDuration = secondToLastImageDuration;
-				pauseTime = secondToLastPauseTime;
+				fadeTime *= 3.0;
+				imageDuration *= 3.0;
+				pauseTime *= 3.0;
 				// console.log( "***6 imageDuration to " + imageDuration );
 			}
+			// if ( currentIndex === images.length - 2 )
+			// {
+			// 	isSecondToLastImage = true;
+			// 	fadeTime = secondToLastFadeTime;
+			// 	imageDuration = secondToLastImageDuration;
+			// 	pauseTime = secondToLastPauseTime;
+			// 	// console.log( "***6 imageDuration to " + imageDuration );
+			// }
 
 			if (currentIndex >= images.length) 
 				return;
