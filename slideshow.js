@@ -68,17 +68,17 @@ class Slideshow
 	{
 		const FAST_INTRO = false;
 		const defaultFadeTime = 800 * 1.0;
-		const defaultImageDuration = 3600 - 2500; // * 0.1;
+		const defaultImageDuration = 3600 - 2500 + 230; // * 0.1;
 		const finalFadeTime = 2000;
 		const finalImageDuration = 6000;
 		const finalPauseTime = 1000;
 		const secondToLastFadeTime = 200;
 		const secondToLastImageDuration = 200;
 		const secondToLastPauseTime = 200;
-		const scaleFactor = 1.05;
+		const scaleFactor = 0.35; // 1.05;
 		let PANSPEED_SCALE = 1.5;
 		const OLD_AUDIO_ENABLED = false;
-		const NEW_AUDIO_ENABLED = true;
+		const NEW_AUDIO_ENABLED = false;
 
 		// Disable the menu bar
 		// Menu.setApplicationMenu( null );
@@ -130,6 +130,7 @@ class Slideshow
         const secondToLastPauseTime		   =  ${secondToLastPauseTime};
         const scaleFactor = ${scaleFactor};
         let PANSPEED_SCALE = ${PANSPEED_SCALE};
+		let ALTERNATE = 250;
         let currentImage;
         let nextImage;
         let currentAudio;
@@ -143,7 +144,7 @@ class Slideshow
         let nextPanX = 0, nextPanY = 0, nextPanSpeedX = 0, nextPanSpeedY = 0, nextPanAngle = 0;
         let fadeTime = defaultFadeTime;
         let imageDuration = 2500; // initial image
-		  console.log( "***1 imageDuration to " + imageDuration )
+		//   console.log( "***1 imageDuration to " + imageDuration )
         let pauseTime = 0;
         let alphaStep = 255 / (fadeTime * 60 / 1000);
         let isFinalImage = false;
@@ -164,7 +165,7 @@ class Slideshow
                 }
             }
             if (audioFiles.length > 0 && OLD_AUDIO_ENABLED) {
-				console.log( "LEZZ PLAY DAT AUDIOSS" )
+				// console.log( "LEZZ PLAY DAT AUDIOSS" )
                 currentAudio = loadSound(audioFiles[0], 
                     () => console.log('Preload: Loaded audio:', audioFiles[0]),
                     err => console.error('Preload: Error loading audio:', audioFiles[0], err)
@@ -174,7 +175,7 @@ class Slideshow
 
         function setup() {
             createCanvas(windowWidth, windowHeight);
-            console.log('Setup: Canvas created with dimensions:', windowWidth, 'x', windowHeight);
+            // console.log('Setup: Canvas created with dimensions:', windowWidth, 'x', windowHeight);
             background(0);
             setNewPanDirection('current');
             lastSwitchTime = millis();
@@ -193,7 +194,7 @@ class Slideshow
             currentAudio = loadSound(audioFiles[audioIndex], 
                 () => {
                     if (isSlideshowActive && OLD_AUDIO_ENABLED) {
-                        console.log('Playing audio:', audioFiles[audioIndex]);
+                        // console.log('Playing audio:', audioFiles[audioIndex]);
                         currentAudio.play();
                         currentAudio.onended(() => {
                             audioIndex = (audioIndex + 1) % audioFiles.length;
@@ -248,11 +249,11 @@ class Slideshow
                 }
             } else if (phase === 'pause') {
                 if (elapsed >= imageDuration + fadeTime + pauseTime) {
-                    console.log('Final image display complete. Stopping slideshow.');
+                    // console.log('Final image display complete. Stopping slideshow.');
                     isSlideshowActive = false;
                     if (currentAudio) {
                         currentAudio.stop();
-                        console.log('Stopped audio at slideshow end');
+                        // console.log('Stopped audio at slideshow end');
                     }
                     window.electronAPI.closeWindow();
                     return;
@@ -310,8 +311,9 @@ class Slideshow
                 let maxPanY = (imgH - height) / 4;
                 nextPanX += nextPanSpeedX;
                 nextPanY += nextPanSpeedY;
-                nextPanX = constrain(nextPanX, -maxPanX, maxPanX);
-                nextPanY = constrain(nextPanY, -maxPanY, maxPanY);
+                // nextPanX = constrain(nextPanX, -maxPanX, maxPanX);
+                // nextPanY = constrain(nextPanY, -maxPanY, maxPanY);
+
 
                 let x = width / 2 + nextPanX;
                 let y = height / 2 + nextPanY;
@@ -336,18 +338,18 @@ class Slideshow
 				if ( wasFirstImage )
 				{
 					imageDuration = 200;
-					console.log( "***3 imageDuration to " + imageDuration );
+					// console.log( "***3 imageDuration to " + imageDuration );
 				}
 				else
 				{
 					imageDuration = defaultImageDuration;
-					console.log( "***4 imageDuration to " + imageDuration );
+					// console.log( "***4 imageDuration to " + imageDuration );
 				}
 
 				if ( FAST_INTRO && isFirstImage )
 				{
 					imageDuration = 100; // temp
-					console.log( "***4.5 imageDuration to " + imageDuration );
+					// console.log( "***4.5 imageDuration to " + imageDuration );
 				}
 
 				if (currentIndex === images.length - 1) 
@@ -355,14 +357,14 @@ class Slideshow
 					isFinalImage = true;
 					fadeTime = finalFadeTime;
 					imageDuration = finalImageDuration;
-					console.log( "***5 imageDuration to " + imageDuration );
+					// console.log( "***5 imageDuration to " + imageDuration );
 					pauseTime = finalPauseTime;
 					alphaStep = 255 / (fadeTime * 60 / 1000);
 					panSpeedX = 0;
 					panSpeedY = 0;
-					console.log( "--8 panspeed to " + panSpeedX )
+					// console.log( "--8 panspeed to " + panSpeedX )
 
-					console.log( "*********** FINAL IMAGE *********" )
+					// console.log( "*********** FINAL IMAGE *********" )
 					PANSPEED_SCALE = 0;
 					currentPanSpeedX = 0;
 					currentPanSpeedY = 0;
@@ -380,7 +382,7 @@ class Slideshow
 					fadeTime = secondToLastFadeTime;
 					imageDuration = secondToLastImageDuration;
 					pauseTime = secondToLastPauseTime;
-					console.log( "***6 imageDuration to " + imageDuration );
+					// console.log( "***6 imageDuration to " + imageDuration );
 					}
 
 				if (currentIndex >= images.length) {
@@ -401,14 +403,14 @@ class Slideshow
                 panY = currentPanY;
                 panSpeedX = currentPanSpeedX;
                 panSpeedY = currentPanSpeedY;
-					 console.log( "--3 panspeed to " + panSpeedX )
+					//  console.log( "--3 panspeed to " + panSpeedX )
             } else { // 'next'
                 panAngle = nextPanAngle;
                 panX = nextPanX;
                 panY = nextPanY;
                 panSpeedX = nextPanSpeedX;
                 panSpeedY = nextPanSpeedY;
-					 console.log( "--4 panspeed to " + panSpeedX )
+					//  console.log( "--4 panspeed to " + panSpeedX )
             }
 
             panAngle = random(TWO_PI);
@@ -437,7 +439,7 @@ class Slideshow
             // let totalDisplayTime = (type === 'current' && isFinalImage) ? finalImageDuration + finalFadeTime : defaultImageDuration + defaultFadeTime;
             let frames = (totalDisplayTime / 1000) * 60;
             panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
-				console.log( "--1 panspeed to " + panSpeedX )
+				// console.log( "--1 panspeed to " + panSpeedX )
             panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
             panSpeedX *= PANSPEED_SCALE;
             panSpeedY *= PANSPEED_SCALE;
@@ -445,10 +447,15 @@ class Slideshow
 				{
 					panSpeedX = 0;
 					panSpeedY = 0;
-					console.log( "--2 panspeed to 0" )
+					// console.log( "--2 panspeed to 0" )
 				}
 				
+			// let rand_x = -500 + ( Math.random() * 1000 );
+			// console.log( "Rand_x " + rand_x )
             panX = -maxPanX * cos(panAngle);
+			console.log ( "ALTERNATE " + ALTERNATE + ", panX " + panX )
+
+			panX += ALTERNATE;
             panY = -maxPanY * sin(panAngle);
 
             if (type === 'current') {
@@ -459,6 +466,7 @@ class Slideshow
                 currentPanSpeedY = panSpeedY;
                 console.log('SetNewPanDirection (current): angle:', currentPanAngle, 'speedX:', currentPanSpeedX, 'speedY:', currentPanSpeedY);
             } else { // 'next'
+				ALTERNATE = ALTERNATE * -1;
                 nextPanAngle = panAngle;
                 nextPanX = panX;
                 nextPanY = panY;
