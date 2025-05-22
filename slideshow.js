@@ -69,7 +69,7 @@ class Slideshow
 		const FAST_INTRO = false;
 		const MULT = 1.0;
 		const defaultFadeTime = ( 800 * 1.0 ) * MULT;
-		const defaultImageDuration = ( 3600 - 2500 + 230 ) * MULT;
+		const defaultImageDuration = ( 2330 + 240 ) * MULT;
 		const secondToLastFadeTime = 200;
 		const secondToLastImageDuration = 200;
 		const secondToLastPauseTime = 200;
@@ -77,7 +77,7 @@ class Slideshow
 		let PANSPEED_SCALE = 0.5;
 		let ALTERNATE = -300;
 		const OLD_AUDIO_ENABLED = false;
-		const NEW_AUDIO_ENABLED = false;
+		const NEW_AUDIO_ENABLED = true;
 
 		// Disable the menu bar
 		// Menu.setApplicationMenu( null );
@@ -157,33 +157,33 @@ class Slideshow
 
 			// allie
 			1.1328128513496225, 
-			3.627222058910939, 
+			4.627222058910939, 
 			2.7408116605321027, 
 			
 			// august
-			1.0908302596333452, 
+			1.5908302596333452, 
 			2.355196958215871, 
 			3.7159306747722938, 
 			
 			// charlie
 			2.624366046866113, 
-			0.8599736763402498, 
+			1.2599736763402498, 
 			0.8393499871660995, 
 			
 			// dawson
-			2.271983183588195, 
-			0.8340514250170651, 
-			5.491458619971771, 
+			1.271983183588195, 
+			3.8340514250170651, 
+			0.991458619971771, 
 			
 			// elise
 			3.7450459812105206, 
-			0.85717875157505, 
+			1.85717875157505, 
 			0.6277446855814743, 
 			
 			// ella
-			0.09429879134978553, 
+			1.09429879134978553, 
 			3.97330752116559, 
-			1.5206361185085047, 
+			4.906361185085047, 
 			
 			// florence
 			5.949627383241286, 
@@ -191,9 +191,9 @@ class Slideshow
 			4.664837733761826, 
 			
 			// george
-			5.9673177948605645, 
-			0.759786645166142, 
-			0.10903091809768686, 
+			0.9673177948605645, 
+			2.759786645166142, 
+			3.10903091809768686, 
 
 			// jack
 			0.9077026323558282, 
@@ -201,8 +201,8 @@ class Slideshow
 			4.445124816868618, 
 
 			// jaimin
-			3.1234769935895645, 
-			5.376347463418245, 
+			1.1234769935895645, 
+			1.376347463418245, 
 			0.5427511040870574, 
 
 			// khushi
@@ -221,14 +221,14 @@ class Slideshow
 			5.3741188239300035, 
 
 			// leo
-			4.734727630971292, 
+			2.734727630971292, 
 			0.8293759752188661, 
-			3.610347038106177, 
+			1.610347038106177, 
 
 			// linly
-			1.8353788343044466, 
+			0.8353788343044466, 
 			4.259825421263206, 
-			4.261502342642173, 
+			1.261502342642173, 
 
 			// matilda
 			5.337361865809745, 
@@ -243,22 +243,22 @@ class Slideshow
 			// nich
 			2.9790893770367353, 
 			2.172830276540797, 
-			5.347414474126533, 
+			1.347414474126533, 
 
 			// olu
 			0.69192543600446, 
 			1.790926008729001, 
-			5.834695848281068, 
+			3.834695848281068, 
 
 			// ryland
 			2.8199494650911996, 
-			0.2537633162564111, 
-			2.9965324544079333, 
+			1.2537633162564111, 
+			4.9965324544079333, 
 
 			// spencer
 			1.2290334012423494, 
-			3.385676033618444, 
-			0.2537633162564111, 
+			2.385676033618444, 
+			4.2537633162564111, 
 
 			// william
 			2.580212368228481, 
@@ -604,13 +604,19 @@ class Slideshow
 			// panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
             panSpeedX *= PANSPEED_SCALE;
             panSpeedY *= PANSPEED_SCALE;
+			if ( Math.abs( panSpeedY ) > 2.0 )
+				panSpeedY *= 0.5;
 
 			// let rand_x = -500 + ( Math.random() * 1000 );
 			// console.log( "Rand_x " + rand_x )
             panX = -maxPanX * cos(panAngle);
 			// console.log ( "ALTERNATE " + ALTERNATE + ", panX " + panX )
 
-			panX += ALTERNATE;
+			if ( ALTERNATE < 0 )
+				panX += ALTERNATE * 0.8;
+			else
+				panX += ALTERNATE;
+
             panY = -maxPanY * sin(panAngle);
 
             if (type === 'current') {
