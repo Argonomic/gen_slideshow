@@ -70,9 +70,6 @@ class Slideshow
 		const MULT = 1.0;
 		const defaultFadeTime = ( 800 * 1.0 ) * MULT;
 		const defaultImageDuration = ( 3600 - 2500 + 230 ) * MULT;
-		const finalFadeTime = 2000;
-		const finalImageDuration = 6000;
-		const finalPauseTime = 1000;
 		const secondToLastFadeTime = 200;
 		const secondToLastImageDuration = 200;
 		const secondToLastPauseTime = 200;
@@ -122,9 +119,6 @@ class Slideshow
         const audioFiles = ${JSON.stringify( this.audioFiles )}; // old
         const defaultFadeTime = ${defaultFadeTime};
         const defaultImageDuration = ${defaultImageDuration};
-        const finalFadeTime = ${finalFadeTime};
-        const finalImageDuration = ${finalImageDuration};
-        const finalPauseTime = ${finalPauseTime};
         const secondToLastFadeTime =  ${secondToLastFadeTime};
 		const OLD_AUDIO_ENABLED = ${OLD_AUDIO_ENABLED};
 		const NEW_AUDIO_ENABLED = ${NEW_AUDIO_ENABLED};
@@ -152,81 +146,125 @@ class Slideshow
 		//   console.log( "***1 imageDuration to " + imageDuration )
         let pauseTime = 0;
         let alphaStep = 255 / (fadeTime * 60 / 1000);
-        let isFinalImage = false;
 		let isSecondToLastImage = false;
 
-		let isFirstImage = true;
         let isSlideshowActive = true;
 
 		let angleIndex = 0;
 		let angles = [
-			4.343606543447316, 
+			
+			0, // intro
+
+			// allie
 			1.1328128513496225, 
 			3.627222058910939, 
 			2.7408116605321027, 
+			
+			// august
 			1.0908302596333452, 
 			2.355196958215871, 
 			3.7159306747722938, 
+			
+			// charlie
 			2.624366046866113, 
 			0.8599736763402498, 
 			0.8393499871660995, 
+			
+			// dawson
 			2.271983183588195, 
 			0.8340514250170651, 
 			5.491458619971771, 
+			
+			// elise
 			3.7450459812105206, 
 			0.85717875157505, 
 			0.6277446855814743, 
+			
+			// ella
 			0.09429879134978553, 
 			3.97330752116559, 
 			1.5206361185085047, 
+			
+			// florence
 			5.949627383241286, 
 			6.207538973606385, 
 			4.664837733761826, 
+			
+			// george
 			5.9673177948605645, 
 			0.759786645166142, 
 			0.10903091809768686, 
+
+			// jack
 			0.9077026323558282, 
 			0.5755051317961674, 
 			4.445124816868618, 
+
+			// jaimin
 			3.1234769935895645, 
 			5.376347463418245, 
 			0.5427511040870574, 
+
+			// khushi
 			2.5704497756635276, 
 			0.2537633162564111, 
 			4.859970098714183, 
-			1.673518063214312, 
-			4.073412820472541, 
-			2.7718925584467673, 
-			2.9965324544079333, 
-			1.2290334012423494, 
-			3.385676033618444, 
+
+			// kinsey
 			2.8199494650911996, 
 			2.580212368228481, 
 			3.748572423408948, 
+
+			// lainey
 			4.542229816677456, 
-			4.734727630971292, 
+			0.2537633162564111, 
 			5.3741188239300035, 
+
+			// leo
+			4.734727630971292, 
 			0.8293759752188661, 
 			3.610347038106177, 
+
+			// linly
 			1.8353788343044466, 
 			4.259825421263206, 
 			4.261502342642173, 
+
+			// matilda
 			5.337361865809745, 
 			2.068418954339531, 
-			4.983596093499767, 
 			4.008512307724525, 
+
+			// naomi
 			4.872948294615419, 
-			4.760617123938583, 
-			4.603953411395549, 
 			3.1951734496561937, 
 			2.1953111155025478, 
+
+			// nich
 			2.9790893770367353, 
 			2.172830276540797, 
 			5.347414474126533, 
+
+			// olu
 			0.69192543600446, 
 			1.790926008729001, 
 			5.834695848281068, 
-			]
+
+			// ryland
+			2.8199494650911996, 
+			0.2537633162564111, 
+			2.9965324544079333, 
+
+			// spencer
+			1.2290334012423494, 
+			3.385676033618444, 
+			0.2537633162564111, 
+
+			// william
+			2.580212368228481, 
+			3.748572423408948, 
+			4.542229816677456, 
+		]
 
 
 		function preload() {
@@ -288,30 +326,14 @@ class Slideshow
             if (phase === 'fadeIn') 
 			{
                 currentAlpha = min(currentAlpha + alphaStep, 255);
-				if ( personalImageTracker == 1 && elapsed >= fadeTime + 350 || personalImageTracker != 1 && currentAlpha >= 255 )
+				if ( personalImageTracker == 1 && elapsed >= fadeTime + 650 || personalImageTracker != 1 && currentAlpha >= 255 )
 				{
                     currentAlpha = 255;
-                    phase = 'crossfade_IN'; // 'display';
+                    phase = 'secondImage_FadeIn';
                     setNewPanDirection('next');
                 }
             } 
-			else if (phase === 'display') 
-			{
-                currentAlpha = 255;
-                if (elapsed >= imageDuration) 
-				{
-                    phase = 'crossfade_IN';
-                    if (isFinalImage)
-					{
-                        nextImage = null;
-                    }
-					else
-					{
-                        setNewPanDirection('next');
-                    }
-                }
-            } 
-			else if (phase === 'crossfade_IN') 
+			else if (phase === 'secondImage_FadeIn') 
 			{
 				currentAlpha = 255;
                 if (nextImage)
@@ -332,17 +354,19 @@ class Slideshow
 					nextAlpha = 255;
                 }
 
-				// if ( millis() - lastPhaseChangeTime > 1200 )
-				if (elapsed >= imageDuration * 1.35 )
+				if ( personalImageTracker >= 2 )
 				{
-					personalImageTracker += 1;
-					console.log( "personalImageTracker: " + personalImageTracker )
-					if ( personalImageTracker >= 3 )
+					if (elapsed >= imageDuration * 1.35 )
 					{
+						personalImageTracker += 1;
 						phase = 'allfade_OUT';
 					}
-					else
+				}
+				else
+				{
+					if (elapsed >= imageDuration * 2.0 )
 					{
+						personalImageTracker += 1;
 						phase = 'crossfade_OUT';
 					}
 				}
@@ -356,34 +380,25 @@ class Slideshow
 
                 if (currentAlpha <= 0) 
 				{
-                    if (isFinalImage) 
-					{
-                        phase = 'final_image_pause';
-                    } 
-					else 
-					{
-                        switchImage();
-                        lastSwitchTime = millis();
-                        phase = 'fadeIn';
-                        currentAlpha = nextAlpha;
-                        nextAlpha = 0;
-                        currentPanX = nextPanX;
-                        currentPanY = nextPanY;
-                        currentPanSpeedX = nextPanSpeedX;
-                        currentPanSpeedY = nextPanSpeedY;
-                        currentPanAngle = nextPanAngle;
-                    }
+					switchImage();
+		            // setNewPanDirection('current');
+
+					lastSwitchTime = millis();
+					phase = 'fadeIn';
+					currentAlpha = nextAlpha;
+					nextAlpha = 0;
+					currentPanX = nextPanX;
+					currentPanY = nextPanY;
+					currentPanSpeedX = nextPanSpeedX;
+					currentPanSpeedY = nextPanSpeedY;
+					currentPanAngle = nextPanAngle;
                 }
             } 
 			else if (phase === 'allfade_OUT') 
 			{
 				if ( elapsed >= 2800 )
 				{
-	                currentAlpha = max(currentAlpha - ( alphaStep * 1.5 ), 0);
-				}
-
-				if ( elapsed >= 3100 )
-				{
+	                currentAlpha = max(currentAlpha - ( alphaStep ), 0);
     	            if ( nextImage )
 					{
 	        	        nextAlpha = max(nextAlpha - alphaStep, 0);
@@ -393,48 +408,30 @@ class Slideshow
 
                 if ( currentAlpha <= 0 && nextAlpha <= 0 && elapsed > 3600 )
 				{
-                    if (isFinalImage) 
-					{
-                        phase = 'final_image_pause';
-                    } 
-					else 
-					{
-						personalImageTracker = 1;
+					personalImageTracker = 1;
 
-                        switchImage();
-                        switchImage();
-                        lastSwitchTime = millis();
-                        phase = 'fadeIn';
-                        currentAlpha = 0; // nextAlpha;
-                        nextAlpha = 0;
-                        currentPanX = nextPanX;
-                        currentPanY = nextPanY;
-                        currentPanSpeedX = nextPanSpeedX;
-                        currentPanSpeedY = nextPanSpeedY;
-                        currentPanAngle = nextPanAngle;
-                    }
+					switchImage();
+					switchImage();
+		            setNewPanDirection('next');
+
+					lastSwitchTime = millis();
+					phase = 'fadeIn';
+                    currentAlpha = 0; // nextAlpha;
+					nextAlpha = 0;
+					currentPanX = nextPanX;
+					currentPanY = nextPanY;
+					currentPanSpeedX = nextPanSpeedX;
+					currentPanSpeedY = nextPanSpeedY;
+					currentPanAngle = nextPanAngle;
                 }
             } 
-			else if (phase === 'final_image_pause') 
-			{
-                if (elapsed >= imageDuration + fadeTime + pauseTime) {
-                    // console.log('Final image display complete. Stopping slideshow.');
-                    isSlideshowActive = false;
-                    if (currentAudio) {
-                        currentAudio.stop();
-                        // console.log('Stopped audio at slideshow end');
-                    }
-                    window.electronAPI.closeWindow();
-                    return;
-                }
-            }
 
 			if ( phase != lastPhase )
 			{
-				console.log( "" )
+				// console.log( "" )
 				// console.log( "" )
 				// console.log( "***********************************************************************" )
-				console.log( "****************************** PHASE: " + phase + ", elasped: " + elapsed )
+				console.log( "**** PHASE: " + phase + ", elasped: " + elapsed )
 				lastPhase = phase;
 				lastPhaseChangeTime = millis();
 			}
@@ -475,8 +472,8 @@ class Slideshow
                 pop();
             }
 
-            // Draw next image during crossfade_IN
-            if (nextImage && ( phase === 'allfade_OUT' || phase === 'crossfade_IN' || phase === 'crossfade_OUT' || phase === 'crossfade_PLAY' ) ) {
+            // Draw next image during secondImage_FadeIn
+            if (nextImage && ( phase === 'allfade_OUT' || phase === 'secondImage_FadeIn' || phase === 'crossfade_OUT' || phase === 'crossfade_PLAY' ) ) {
                 let imgRatio = nextImage.width / nextImage.height;
                 let canvasRatio = width / height;
                 let imgW, imgH;
@@ -515,52 +512,7 @@ class Slideshow
 		{
             currentIndex = (currentIndex + 1);
 
-			let wasFirstImage = isFirstImage;
-			isFirstImage = false;
-
-			if ( wasFirstImage )
-			{
-				imageDuration = defaultImageDuration;
-				// imageDuration = 200;
-				// console.log( "***3 imageDuration to " + imageDuration );
-			}
-			else
-			{
-				imageDuration = defaultImageDuration;
-				// console.log( "***4 imageDuration to " + imageDuration );
-			}
-
-			if ( FAST_INTRO && isFirstImage )
-			{
-				imageDuration = 100; // temp
-				// console.log( "***4.5 imageDuration to " + imageDuration );
-			}
-
-			if (currentIndex === images.length - 1) 
-			{
-				isFinalImage = true;
-				fadeTime = finalFadeTime;
-				imageDuration = finalImageDuration;
-				// console.log( "***5 imageDuration to " + imageDuration );
-				pauseTime = finalPauseTime;
-				alphaStep = 255 / (fadeTime * 60 / 1000);
-				panSpeedX = 0;
-				console.log( "--2 panspeed to " + panSpeedX )
-
-				panSpeedY = 0;
-				// console.log( "--8 panspeed to " + panSpeedX )
-
-				// console.log( "*********** FINAL IMAGE *********" )
-				PANSPEED_SCALE = 0;
-				currentPanSpeedX = 0;
-				currentPanSpeedY = 0;
-				nextPanSpeedX = 0;
-				nextPanSpeedY = 0;
-				console.log('Switching to final image with custom timing:', 
-					'fadeTime:', fadeTime, 
-					'imageDuration:', imageDuration, 
-					'pauseTime:', pauseTime);
-			}
+			imageDuration = defaultImageDuration;
 
 			if ( currentIndex === images.length - 2 )
 			{
@@ -578,7 +530,6 @@ class Slideshow
 
             currentImage = nextImage || currentImage;
             nextImage = currentIndex + 1 < images.length ? loadImage(images[currentIndex + 1]) : null;
-            setNewPanDirection('current');
         }
 
         function setNewPanDirection(type) 
@@ -592,7 +543,7 @@ class Slideshow
                 panSpeedX = currentPanSpeedX;
                 panSpeedY = currentPanSpeedY;
 				
-				console.log( "--3 panspeed to " + panSpeedX )
+				// console.log( "--3 panspeed to " + panSpeedX )
             }
 			else 
 			{ // 'next'
@@ -601,15 +552,15 @@ class Slideshow
                 panY = nextPanY;
                 panSpeedX = nextPanSpeedX;
                 panSpeedY = nextPanSpeedY;
-				console.log( "--4 panspeed to " + panSpeedX )
+				// console.log( "--4 panspeed to " + panSpeedX )
             }
 
             // panAngle = random(TWO_PI);
 			panAngle = angles[angleIndex];
+			console.log( " ** panAngle: " + panAngle + " index " + angleIndex )
 			angleIndex++;
 			angleIndex %= angles.length;
 
-			console.log( "panAngle: " + panAngle )
             let imgRatio = (type === 'current' ? currentImage : nextImage).width / (type === 'current' ? currentImage : nextImage).height;
             let canvasRatio = windowWidth / windowHeight;
             let imgW, imgH;
@@ -626,39 +577,38 @@ class Slideshow
 
             let maxPanX = (imgW - width) / 4;
             let maxPanY = (imgH - height) / 4;
-			console.log( "maxPanX:" + maxPanX + ", maxPanY:" + maxPanY )
+			// console.log( "maxPanX:" + maxPanX + ", maxPanY:" + maxPanY )
 				
 			let totalDisplayTime = defaultImageDuration + defaultFadeTime;
 			if ( type === 'current' )
 			{
-				if ( isFinalImage )
-					totalDisplayTime = finalImageDuration + finalFadeTime;
-				else if ( isSecondToLastImage )
+				if ( isSecondToLastImage )
 					totalDisplayTime = secondToLastImageDuration + secondToLastFadeTime;
 			}
 
-            // let totalDisplayTime = (type === 'current' && isFinalImage) ? finalImageDuration + finalFadeTime : defaultImageDuration + defaultFadeTime;
             let frames = (totalDisplayTime / 1000) * 60;
             // panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
             panSpeedX = (2 * maxPanX / frames) * cos(panAngle) * 0.1;
             panSpeedY = (2 * maxPanY / frames) * sin(panAngle) * 2.0;
-			console.log( "--1 panspeed to " + panSpeedX + ":" + panSpeedY )
+
+			for ( ;; )
+			{
+				if ( Math.abs( panSpeedY ) < 2.5 )
+					break
+				panSpeedY *= 0.85;
+			}
+			
+
+			// console.log( "--1 panspeed to " + panSpeedX + ":" + panSpeedY )
 
 			// panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
             panSpeedX *= PANSPEED_SCALE;
             panSpeedY *= PANSPEED_SCALE;
 
-			if ( 0 && ( isFirstImage || isFinalImage ) )
-			{
-				panSpeedX = 0;
-				panSpeedY = 0;
-				// console.log( "--2 panspeed to 0" )
-			}
-			
 			// let rand_x = -500 + ( Math.random() * 1000 );
 			// console.log( "Rand_x " + rand_x )
             panX = -maxPanX * cos(panAngle);
-			console.log ( "ALTERNATE " + ALTERNATE + ", panX " + panX )
+			// console.log ( "ALTERNATE " + ALTERNATE + ", panX " + panX )
 
 			panX += ALTERNATE;
             panY = -maxPanY * sin(panAngle);
@@ -669,7 +619,7 @@ class Slideshow
                 currentPanY = panY;
                 currentPanSpeedX = panSpeedX;
                 currentPanSpeedY = panSpeedY;
-                console.log('SetNewPanDirection (current): angle:', currentPanAngle, 'speedX:', currentPanSpeedX, 'speedY:', currentPanSpeedY);
+                // console.log('SetNewPanDirection (current): angle:', currentPanAngle, 'speedX:', currentPanSpeedX, 'speedY:', currentPanSpeedY);
             } else { // 'next'
 				ALTERNATE = ALTERNATE * -1;
                 nextPanAngle = panAngle;
@@ -677,7 +627,7 @@ class Slideshow
                 nextPanY = panY;
                 nextPanSpeedX = panSpeedX;
                 nextPanSpeedY = panSpeedY;
-                console.log('SetNewPanDirection (next): angle:', nextPanAngle, 'speedX:', nextPanSpeedX, 'speedY:', nextPanSpeedY);
+                // console.log('SetNewPanDirection (next): angle:', nextPanAngle, 'speedX:', nextPanSpeedX, 'speedY:', nextPanSpeedY);
             }
         }
 
