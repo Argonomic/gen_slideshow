@@ -67,16 +67,18 @@ class Slideshow
 	start()
 	{
 		const FAST_INTRO = false;
-		const defaultFadeTime = 800 * 1.0;
-		const defaultImageDuration = 3600 - 2500 + 230; // * 0.1;
+		const MULT = 1.0;
+		const defaultFadeTime = ( 800 * 1.0 ) * MULT;
+		const defaultImageDuration = ( 3600 - 2500 + 230 ) * MULT;
 		const finalFadeTime = 2000;
 		const finalImageDuration = 6000;
 		const finalPauseTime = 1000;
 		const secondToLastFadeTime = 200;
 		const secondToLastImageDuration = 200;
 		const secondToLastPauseTime = 200;
-		const scaleFactor = 0.35; // 1.05;
-		let PANSPEED_SCALE = 1.5;
+		const scaleFactor = 0.4; // 1.05;
+		let PANSPEED_SCALE = 0.5;
+		let ALTERNATE = -300;
 		const OLD_AUDIO_ENABLED = false;
 		const NEW_AUDIO_ENABLED = false;
 
@@ -130,20 +132,23 @@ class Slideshow
         const secondToLastPauseTime		   =  ${secondToLastPauseTime};
         const scaleFactor = ${scaleFactor};
         let PANSPEED_SCALE = ${PANSPEED_SCALE};
-		let ALTERNATE = 250;
+		let ALTERNATE = ${ALTERNATE};
         let currentImage;
         let nextImage;
+		let lastPhase = "";
+		let lastPhaseChangeTime = 0;
         let currentAudio;
         let currentIndex = 0;
         let audioIndex = 0;
         let currentAlpha = 0;
+		let personalImageTracker = 0;
         let nextAlpha = 0;
         let phase = 'fadeIn';
         let lastSwitchTime = 0;
         let currentPanX = 0, currentPanY = 0, currentPanSpeedX = 0, currentPanSpeedY = 0, currentPanAngle = 0;
         let nextPanX = 0, nextPanY = 0, nextPanSpeedX = 0, nextPanSpeedY = 0, nextPanAngle = 0;
         let fadeTime = defaultFadeTime;
-        let imageDuration = 2500; // initial image
+        let imageDuration = 0; // = 2500; // initial image
 		//   console.log( "***1 imageDuration to " + imageDuration )
         let pauseTime = 0;
         let alphaStep = 255 / (fadeTime * 60 / 1000);
@@ -210,31 +215,83 @@ class Slideshow
             background(0);
             let elapsed = millis() - lastSwitchTime;
 
-            if (phase === 'fadeIn') {
+            if (phase === 'fadeIn') 
+			{
                 currentAlpha = min(currentAlpha + alphaStep, 255);
-                if (elapsed >= fadeTime) {
+				if ( personalImageTracker == 1 && elapsed >= fadeTime + 350 || personalImageTracker != 1 && currentAlpha >= 255 )
+				{
                     currentAlpha = 255;
-                    phase = 'display';
+                    phase = 'crossfade_IN'; // 'display';
+                    setNewPanDirection('next');
                 }
-            } else if (phase === 'display') {
+            } 
+			else if (phase === 'display') 
+			{
                 currentAlpha = 255;
-                if (elapsed >= imageDuration) {
-                    phase = 'crossfade';
-                    if (isFinalImage) {
+                if (elapsed >= imageDuration) 
+				{
+                    phase = 'crossfade_IN';
+                    if (isFinalImage)
+					{
                         nextImage = null;
-                    } else {
+                    }
+					else
+					{
                         setNewPanDirection('next');
                     }
                 }
-            } else if (phase === 'crossfade') {
-                currentAlpha = max(currentAlpha - alphaStep, 0);
-                if (nextImage) {
-                    nextAlpha = min(nextAlpha + alphaStep, 255 - currentAlpha);
+            } 
+			else if (phase === 'crossfade_IN') 
+			{
+				currentAlpha = 255;
+                if (nextImage)
+				{
+                    nextAlpha = min(nextAlpha + alphaStep, 255);
+					if ( nextAlpha >= 255 )
+					{
+						phase = 'crossfade_PLAY';
+						nextAlpha = 255;
+					}
                 }
-                if (currentAlpha <= 0) {
-                    if (isFinalImage) {
-                        phase = 'pause';
-                    } else {
+            } 
+			else if (phase === 'crossfade_PLAY') 
+			{
+				currentAlpha = 255;
+                if (nextImage) 
+				{
+					nextAlpha = 255;
+                }
+
+				// if ( millis() - lastPhaseChangeTime > 1200 )
+				if (elapsed >= imageDuration * 1.35 )
+				{
+					personalImageTracker += 1;
+					console.log( "personalImageTracker: " + personalImageTracker )
+					if ( personalImageTracker >= 3 )
+					{
+						phase = 'allfade_OUT';
+					}
+					else
+					{
+						phase = 'crossfade_OUT';
+					}
+				}
+            } 
+			else if (phase === 'crossfade_OUT') 
+			{
+                currentAlpha = max(currentAlpha - alphaStep, 0);
+
+                if ( nextImage )
+					nextAlpha = 255;
+
+                if (currentAlpha <= 0) 
+				{
+                    if (isFinalImage) 
+					{
+                        phase = 'final_image_pause';
+                    } 
+					else 
+					{
                         switchImage();
                         lastSwitchTime = millis();
                         phase = 'fadeIn';
@@ -247,7 +304,49 @@ class Slideshow
                         currentPanAngle = nextPanAngle;
                     }
                 }
-            } else if (phase === 'pause') {
+            } 
+			else if (phase === 'allfade_OUT') 
+			{
+				if ( elapsed >= 2800 )
+				{
+	                currentAlpha = max(currentAlpha - ( alphaStep * 1.5 ), 0);
+				}
+
+				if ( elapsed >= 3100 )
+				{
+    	            if ( nextImage )
+					{
+	        	        nextAlpha = max(nextAlpha - alphaStep, 0);
+					}
+				}
+				// console.log( "all fade elapsed time " + elapsed )
+
+                if ( currentAlpha <= 0 && nextAlpha <= 0 && elapsed > 3600 )
+				{
+                    if (isFinalImage) 
+					{
+                        phase = 'final_image_pause';
+                    } 
+					else 
+					{
+						personalImageTracker = 1;
+
+                        switchImage();
+                        switchImage();
+                        lastSwitchTime = millis();
+                        phase = 'fadeIn';
+                        currentAlpha = 0; // nextAlpha;
+                        nextAlpha = 0;
+                        currentPanX = nextPanX;
+                        currentPanY = nextPanY;
+                        currentPanSpeedX = nextPanSpeedX;
+                        currentPanSpeedY = nextPanSpeedY;
+                        currentPanAngle = nextPanAngle;
+                    }
+                }
+            } 
+			else if (phase === 'final_image_pause') 
+			{
                 if (elapsed >= imageDuration + fadeTime + pauseTime) {
                     // console.log('Final image display complete. Stopping slideshow.');
                     isSlideshowActive = false;
@@ -260,8 +359,20 @@ class Slideshow
                 }
             }
 
+			if ( phase != lastPhase )
+			{
+				console.log( "" )
+				// console.log( "" )
+				// console.log( "***********************************************************************" )
+				console.log( "****************************** PHASE: " + phase + ", elasped: " + elapsed )
+				lastPhase = phase;
+				lastPhaseChangeTime = millis();
+			}
+			// console.log( "currentAlpha " + currentAlpha + ", nextAlpha:" + nextAlpha )
+
             // Draw current image
-            if (currentImage) {
+            if ( currentImage ) 
+			{
                 let imgRatio = currentImage.width / currentImage.height;
                 let canvasRatio = width / height;
                 let imgW, imgH;
@@ -294,8 +405,8 @@ class Slideshow
                 pop();
             }
 
-            // Draw next image during crossfade
-            if (nextImage && phase === 'crossfade') {
+            // Draw next image during crossfade_IN
+            if (nextImage && ( phase === 'allfade_OUT' || phase === 'crossfade_IN' || phase === 'crossfade_OUT' || phase === 'crossfade_PLAY' ) ) {
                 let imgRatio = nextImage.width / nextImage.height;
                 let canvasRatio = width / height;
                 let imgW, imgH;
@@ -311,6 +422,7 @@ class Slideshow
                 let maxPanY = (imgH - height) / 4;
                 nextPanX += nextPanSpeedX;
                 nextPanY += nextPanSpeedY;
+				// console.log( "nextPanX:" + nextPanX + " nextPanSpeedX: " + nextPanSpeedX )
                 // nextPanX = constrain(nextPanX, -maxPanX, maxPanX);
                 // nextPanY = constrain(nextPanY, -maxPanY, maxPanY);
 
@@ -329,127 +441,146 @@ class Slideshow
             }
         }
 
-        function switchImage() {
+        function switchImage() 
+		{
             currentIndex = (currentIndex + 1);
 
-				let wasFirstImage = isFirstImage;
-				isFirstImage = false;
+			let wasFirstImage = isFirstImage;
+			isFirstImage = false;
 
-				if ( wasFirstImage )
-				{
-					imageDuration = 200;
-					// console.log( "***3 imageDuration to " + imageDuration );
-				}
-				else
-				{
-					imageDuration = defaultImageDuration;
-					// console.log( "***4 imageDuration to " + imageDuration );
-				}
+			if ( wasFirstImage )
+			{
+				imageDuration = defaultImageDuration;
+				// imageDuration = 200;
+				// console.log( "***3 imageDuration to " + imageDuration );
+			}
+			else
+			{
+				imageDuration = defaultImageDuration;
+				// console.log( "***4 imageDuration to " + imageDuration );
+			}
 
-				if ( FAST_INTRO && isFirstImage )
-				{
-					imageDuration = 100; // temp
-					// console.log( "***4.5 imageDuration to " + imageDuration );
-				}
+			if ( FAST_INTRO && isFirstImage )
+			{
+				imageDuration = 100; // temp
+				// console.log( "***4.5 imageDuration to " + imageDuration );
+			}
 
-				if (currentIndex === images.length - 1) 
-				{
-					isFinalImage = true;
-					fadeTime = finalFadeTime;
-					imageDuration = finalImageDuration;
-					// console.log( "***5 imageDuration to " + imageDuration );
-					pauseTime = finalPauseTime;
-					alphaStep = 255 / (fadeTime * 60 / 1000);
-					panSpeedX = 0;
-					panSpeedY = 0;
-					// console.log( "--8 panspeed to " + panSpeedX )
+			if (currentIndex === images.length - 1) 
+			{
+				isFinalImage = true;
+				fadeTime = finalFadeTime;
+				imageDuration = finalImageDuration;
+				// console.log( "***5 imageDuration to " + imageDuration );
+				pauseTime = finalPauseTime;
+				alphaStep = 255 / (fadeTime * 60 / 1000);
+				panSpeedX = 0;
+				console.log( "--2 panspeed to " + panSpeedX )
 
-					// console.log( "*********** FINAL IMAGE *********" )
-					PANSPEED_SCALE = 0;
-					currentPanSpeedX = 0;
-					currentPanSpeedY = 0;
-					nextPanSpeedX = 0;
-					nextPanSpeedY = 0;
-					console.log('Switching to final image with custom timing:', 
-						'fadeTime:', fadeTime, 
-						'imageDuration:', imageDuration, 
-						'pauseTime:', pauseTime);
-	            }
+				panSpeedY = 0;
+				// console.log( "--8 panspeed to " + panSpeedX )
 
-				if ( currentIndex === images.length - 2 )
-				{
-				    isSecondToLastImage = true;
-					fadeTime = secondToLastFadeTime;
-					imageDuration = secondToLastImageDuration;
-					pauseTime = secondToLastPauseTime;
-					// console.log( "***6 imageDuration to " + imageDuration );
-					}
+				// console.log( "*********** FINAL IMAGE *********" )
+				PANSPEED_SCALE = 0;
+				currentPanSpeedX = 0;
+				currentPanSpeedY = 0;
+				nextPanSpeedX = 0;
+				nextPanSpeedY = 0;
+				console.log('Switching to final image with custom timing:', 
+					'fadeTime:', fadeTime, 
+					'imageDuration:', imageDuration, 
+					'pauseTime:', pauseTime);
+			}
 
-				if (currentIndex >= images.length) {
-                return;
-            }
+			if ( currentIndex === images.length - 2 )
+			{
+				isSecondToLastImage = true;
+				fadeTime = secondToLastFadeTime;
+				imageDuration = secondToLastImageDuration;
+				pauseTime = secondToLastPauseTime;
+				// console.log( "***6 imageDuration to " + imageDuration );
+			}
 
+			if (currentIndex >= images.length) 
+			{
+				return;
+			}
 
             currentImage = nextImage || currentImage;
             nextImage = currentIndex + 1 < images.length ? loadImage(images[currentIndex + 1]) : null;
             setNewPanDirection('current');
         }
 
-        function setNewPanDirection(type) {
+        function setNewPanDirection(type) 
+		{
             let panAngle, panX, panY, panSpeedX, panSpeedY;
-            if (type === 'current') {
+            if (type === 'current')
+			{
                 panAngle = currentPanAngle;
                 panX = currentPanX;
                 panY = currentPanY;
                 panSpeedX = currentPanSpeedX;
                 panSpeedY = currentPanSpeedY;
-					//  console.log( "--3 panspeed to " + panSpeedX )
-            } else { // 'next'
+				
+				console.log( "--3 panspeed to " + panSpeedX )
+            }
+			else 
+			{ // 'next'
                 panAngle = nextPanAngle;
                 panX = nextPanX;
                 panY = nextPanY;
                 panSpeedX = nextPanSpeedX;
                 panSpeedY = nextPanSpeedY;
-					//  console.log( "--4 panspeed to " + panSpeedX )
+				console.log( "--4 panspeed to " + panSpeedX )
             }
 
             panAngle = random(TWO_PI);
+			console.log( "panAngle: " + panAngle )
             let imgRatio = (type === 'current' ? currentImage : nextImage).width / (type === 'current' ? currentImage : nextImage).height;
             let canvasRatio = windowWidth / windowHeight;
             let imgW, imgH;
-            if (imgRatio > canvasRatio) {
+            if (imgRatio > canvasRatio) 
+			{
                 imgH = windowHeight * scaleFactor;
                 imgW = imgH * imgRatio;
-            } else {
+            }
+			else
+			{
                 imgW = windowWidth * scaleFactor;
                 imgH = imgW / imgRatio;
             }
+
             let maxPanX = (imgW - width) / 4;
             let maxPanY = (imgH - height) / 4;
+			console.log( "maxPanX:" + maxPanX + ", maxPanY:" + maxPanY )
 				
-				let totalDisplayTime = defaultImageDuration + defaultFadeTime;
-				if ( type === 'current' )
-				{
-				   if ( isFinalImage )
-						totalDisplayTime = finalImageDuration + finalFadeTime;
-					else if ( isSecondToLastImage )
-						totalDisplayTime = secondToLastImageDuration + secondToLastFadeTime;
-			   }
+			let totalDisplayTime = defaultImageDuration + defaultFadeTime;
+			if ( type === 'current' )
+			{
+				if ( isFinalImage )
+					totalDisplayTime = finalImageDuration + finalFadeTime;
+				else if ( isSecondToLastImage )
+					totalDisplayTime = secondToLastImageDuration + secondToLastFadeTime;
+			}
 
             // let totalDisplayTime = (type === 'current' && isFinalImage) ? finalImageDuration + finalFadeTime : defaultImageDuration + defaultFadeTime;
             let frames = (totalDisplayTime / 1000) * 60;
-            panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
-				// console.log( "--1 panspeed to " + panSpeedX )
-            panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
+            // panSpeedX = maxPanX > 0 ? (2 * maxPanX / frames) * cos(panAngle) : 0;
+            panSpeedX = (2 * maxPanX / frames) * cos(panAngle) * 0.1;
+            panSpeedY = (2 * maxPanY / frames) * sin(panAngle) * 2.0;
+			console.log( "--1 panspeed to " + panSpeedX + ":" + panSpeedY )
+
+			// panSpeedY = maxPanY > 0 ? (2 * maxPanY / frames) * sin(panAngle) : 0;
             panSpeedX *= PANSPEED_SCALE;
             panSpeedY *= PANSPEED_SCALE;
-				if ( isFirstImage || isFinalImage )
-				{
-					panSpeedX = 0;
-					panSpeedY = 0;
-					// console.log( "--2 panspeed to 0" )
-				}
-				
+
+			if ( 0 && ( isFirstImage || isFinalImage ) )
+			{
+				panSpeedX = 0;
+				panSpeedY = 0;
+				// console.log( "--2 panspeed to 0" )
+			}
+			
 			// let rand_x = -500 + ( Math.random() * 1000 );
 			// console.log( "Rand_x " + rand_x )
             panX = -maxPanX * cos(panAngle);
