@@ -69,7 +69,7 @@ class Slideshow
 		const FAST_INTRO = false;
 		const MULT = 1.0;
 		const defaultFadeTime = ( 800 * 1.0 ) * MULT;
-		const defaultImageDuration = ( 2330 + 220 ) * MULT; // ( 2330 + 240 ) * MULT;
+		const defaultImageDuration = ( 2330 + 228 ) * MULT; // ( 2330 + 240 ) * MULT;
 		const secondToLastFadeTime = 200;
 		const secondToLastImageDuration = 200;
 		const secondToLastPauseTime = 200;
@@ -80,12 +80,12 @@ class Slideshow
 		const NEW_AUDIO_ENABLED = true;
 
 		// Disable the menu bar
-		// Menu.setApplicationMenu( null );
+		Menu.setApplicationMenu( null );
 
 		this.window = new BrowserWindow( {
 			width: this.windowWidth,
 			height: this.windowHeight,
-			frame: true, // toggle for title bar
+			frame: false, // true, // toggle for title bar
 			resizable: false,
 			transparent: false,
 			webPreferences: {
